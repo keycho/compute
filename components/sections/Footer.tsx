@@ -40,6 +40,7 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
   {
     heading: "Company",
     links: [
+      { label: "X / @q0rcompute", href: "https://x.com/q0rcompute" },
       { label: "Blog", href: "#top" },
       { label: "Security", href: "#top" },
       { label: "Terms", href: "#top" },
@@ -61,22 +62,41 @@ export default function Footer() {
           <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">
             Every execution leaves a verified receipt
           </p>
+          <a
+            href="https://x.com/q0rcompute"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="q0r on X"
+            className="mt-5 inline-flex items-center gap-2.5 font-mono text-[12px] font-semibold uppercase tracking-[0.12em] text-ink underline decoration-[rgba(255,255,255,0.45)] underline-offset-4 transition-colors hover:decoration-white"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            @q0rcompute
+          </a>
         </div>
 
         {COLUMNS.map((col) => (
           <nav key={col.heading} aria-label={col.heading}>
             <h3 className="col-heading mb-5">{col.heading}</h3>
             <ul className="flex flex-col gap-2.5">
-              {col.links.map((l) => (
-                <li key={l.label}>
-                  <Link
-                    href={l.href}
-                    className="font-mono text-[13px] text-dim underline-offset-4 transition-all duration-150 hover:underline hover:decoration-[rgba(255,255,255,0.6)]"
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
+              {col.links.map((l) => {
+                const cls =
+                  "font-mono text-[13px] text-dim underline-offset-4 transition-all duration-150 hover:underline hover:decoration-[rgba(255,255,255,0.6)]";
+                return (
+                  <li key={l.label}>
+                    {l.href.startsWith("http") ? (
+                      <a href={l.href} target="_blank" rel="noopener noreferrer" className={cls}>
+                        {l.label}
+                      </a>
+                    ) : (
+                      <Link href={l.href} className={cls}>
+                        {l.label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         ))}
