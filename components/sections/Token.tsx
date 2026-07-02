@@ -105,6 +105,14 @@ export default function Token() {
                 note="USDC · distributing"
               />
               <StateRow
+                label="buyback flow"
+                value={
+                  a.lastBuyback ? `${a.lastBuyback.amount.toLocaleString()} Q0R` : "queued"
+                }
+                note={a.lastBuyback ? `open market · ${a.lastBuyback.state}` : "awaiting batch"}
+                cls="text-cyan"
+              />
+              <StateRow
                 label="slashing events"
                 value={a.slashesEpoch}
                 note="failed or invalid execution"
@@ -124,7 +132,7 @@ export default function Token() {
                     pending settlement
                   </p>
                   <p className="tnum mt-1 font-display text-[22px] font-semibold text-mute">
-                    {fmtCompact(a.pendingSettlement)}
+                    {fmtTilde(a.pendingSettlement).replace("~", "~$")}
                   </p>
                   <p className="font-mono text-[10px] text-mute">finalizing next epoch window</p>
                 </div>

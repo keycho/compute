@@ -77,7 +77,8 @@ export default function Hero() {
             </span>
             <span>
               <span className="tnum text-ink">
-                ~{Math.round(snap.approx.jobsInFlight / 1000)}k
+                ~{Math.round(snap.approx.jobsInFlightLo / 1000)}–
+                {Math.round(snap.approx.jobsInFlightHi / 1000)}k
               </span>{" "}
               jobs in flight
             </span>

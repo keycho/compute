@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion, useSpring } from "framer-motion";
 import { useFeed } from "@/lib/useFeed";
-import { fmtRangeMs, fmtTilde } from "@/lib/format";
+import { fmtRangeMs, fmtTildeRange } from "@/lib/format";
 import { itemDetail, itemStatusLabel, itemTitle } from "@/components/ui/feedFormat";
 
 /**
@@ -84,7 +84,10 @@ export default function Telemetry() {
       {/* approx strip */}
       <div className="flex items-center justify-between border-t border-line px-5 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-mute">
         <span>
-          in flight <span className="tnum text-ink">{fmtTilde(snap.approx.jobsInFlight)}</span>
+          in flight{" "}
+          <span className="tnum text-ink">
+            {fmtTildeRange(snap.approx.jobsInFlightLo, snap.approx.jobsInFlightHi)}
+          </span>
         </span>
         <span>
           latency{" "}

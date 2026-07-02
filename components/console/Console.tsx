@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import NetworkMesh from "@/components/gl/NetworkMesh";
 import { Wordmark } from "@/components/ui/Logo";
 import { itemDetail, itemStatusLabel, itemTitle } from "@/components/ui/feedFormat";
-import { fmtRangeMs, fmtTilde } from "@/lib/format";
+import { fmtRangeMs, fmtTildeRange } from "@/lib/format";
 import { createNetwork, stepNetwork } from "@/lib/network";
 import { mulberry32 } from "@/lib/prng";
 import { useFeed } from "@/lib/useFeed";
@@ -142,8 +142,14 @@ function WorkerBlock({
         <Field k="region" v={w.region} />
         <Field
           k="status"
-          v={w.status === "recovered" ? "online" : w.status}
-          cls={w.status === "unstable" ? "text-neg" : "text-pos"}
+          v={w.status}
+          cls={
+            w.status === "unstable"
+              ? "text-neg"
+              : w.status === "throttling"
+                ? "text-violet"
+                : "text-pos"
+          }
         />
         <Field k="gpu" v={w.gpu} />
         {w.note && <Field k="note" v={w.note} cls="text-violet" />}
@@ -156,7 +162,7 @@ function WorkerBlock({
         </p>
         <div className="mt-2 h-[4px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.06)]">
           <div
-            className={`h-full rounded-full transition-[width] duration-1000 ${w.status === "unstable" ? "bg-neg/70" : "bg-signal/70"}`}
+            className={`h-full rounded-full transition-[width] duration-1000 ${w.status === "unstable" || w.status === "throttling" ? "bg-neg/70" : "bg-signal/70"}`}
             style={{ width: `${w.loadNow}%` }}
           />
         </div>
@@ -251,7 +257,7 @@ export default function Console() {
       node: n.id,
       region: n.region,
       gpu: `${n.gpuClass}`,
-      status: n.reliability > 0.975 ? "online" : "unstable",
+      status: n.reliability > 0.975 ? "online" : n.utilization > 0.9 ? "throttling" : "unstable",
       loadLo: Math.max(10, Math.round(n.utilization * 100) - 14),
       loadHi: Math.min(99, Math.round(n.utilization * 100) + 12),
       loadNow: Math.round(n.utilization * 100),
@@ -334,7 +340,7 @@ export default function Console() {
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <span className="col-heading">live feed</span>
           <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-mute">
-            in flight {fmtTilde(snap.approx.jobsInFlight)}
+            in flight {fmtTildeRange(snap.approx.jobsInFlightLo, snap.approx.jobsInFlightHi)}
           </span>
         </div>
         <div className="flex-1 overflow-y-auto px-1.5 py-1.5">
@@ -388,25 +394,34 @@ export default function Console() {
         <span className="col-heading mb-1">network state</span>
         <p className="flex justify-between font-mono text-[11px]">
           <span className="text-mute">providers</span>
-          <span className="tnum text-dim">{snap.approx.providersMasked}</span>
+          <span className="tnum text-dim">
+            {snap.approx.providersMasked}{" "}
+            <span className="text-mute">({snap.approx.providersNote})</span>
+          </span>
         </p>
         <p className="flex justify-between font-mono text-[11px]">
           <span className="text-mute">jobs in flight</span>
-          <span className="tnum text-dim">{fmtTilde(snap.approx.jobsInFlight)}</span>
+          <span className="tnum text-dim">
+            {fmtTildeRange(snap.approx.jobsInFlightLo, snap.approx.jobsInFlightHi)}
+          </span>
         </p>
         <p className="flex justify-between font-mono text-[11px]">
-          <span className="text-mute">median latency</span>
+          <span className="text-mute">latency</span>
           <span className="tnum text-dim">
             {fmtRangeMs(snap.approx.latencyLo, snap.approx.latencyHi)}
           </span>
         </p>
         <p className="flex justify-between font-mono text-[11px]">
-          <span className="text-mute">failover</span>
-          <span className="text-dim">occasional</span>
+          <span className="text-mute">execution density</span>
+          <span className="text-dim">{snap.approx.executionDensity}</span>
         </p>
         <p className="flex justify-between font-mono text-[11px]">
-          <span className="text-mute">settlement</span>
-          <span className="text-dim">epoch-based</span>
+          <span className="text-mute">queue pressure</span>
+          <span className="text-dim">{snap.approx.queuePressure}</span>
+        </p>
+        <p className="flex justify-between font-mono text-[11px]">
+          <span className="text-mute">failover</span>
+          <span className="text-dim">occasional</span>
         </p>
       </div>
 
