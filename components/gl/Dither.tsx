@@ -29,7 +29,10 @@ const fragment = /* glsl */ `
     float lum = dot(inputColor.rgb, vec3(0.299, 0.587, 0.114));
     float t = bayer4(gl_FragCoord.xy) - 0.5;
     float q = clamp(floor(lum * levels + 0.5 + t) / levels, 0.0, 1.0);
-    outputColor = vec4(vec3(q), inputColor.a);
+    // hue-preserving: quantize brightness, keep chroma — grayscale
+    // scenes are unaffected, accent colors survive the dither
+    vec3 col = lum > 0.0001 ? inputColor.rgb * (q / lum) : vec3(q);
+    outputColor = vec4(clamp(col, 0.0, 1.0), inputColor.a);
   }
 `;
 
