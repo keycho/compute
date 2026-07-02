@@ -50,6 +50,17 @@ export default function Nav() {
         </nav>
 
         <div className="hidden items-stretch lg:flex">
+          <a
+            href="https://x.com/q0rcompute"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="q0r on X"
+            className="flex items-center px-4 text-dim transition-opacity duration-150 hover:opacity-70"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
           <div className="mx-2 my-4 w-px bg-line" aria-hidden />
           <Link
             href="/explore"
@@ -102,6 +113,18 @@ export default function Nav() {
                   {l.label}
                 </a>
               ))}
+              <a
+                href="https://x.com/q0rcompute"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 border-b border-line py-4 font-mono text-[13px] uppercase tracking-[0.13em] text-dim"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                @q0rcompute
+              </a>
               <Link
                 href="/explore"
                 className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-signal px-6 py-3.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050505]"
