@@ -43,6 +43,14 @@ const KIND_COLORS: Record<string, [number, number, number]> = {
   settlement: [0.8, 0.8, 0.8],
 };
 
+// accent mode (explorer): phosphor green on the moving/live parts —
+// packets and glow — while structure stays monochrome
+const KIND_COLORS_ACCENT: Record<string, [number, number, number]> = {
+  inference: [0.35, 1.0, 0.58],
+  training: [0.2, 0.58, 0.34],
+  settlement: [0.5, 1.15, 0.68],
+};
+
 const MAX_PACKETS = 96;
 
 export default function NetworkMesh({
@@ -53,6 +61,7 @@ export default function NetworkMesh({
   rotationSpeed = 0.03,
   onPick,
   selected = -1,
+  accent = false,
 }: {
   /** opacity 0..1 — mesh presence; form 0..1 — scale-in on arrival */
   progressRef: React.MutableRefObject<{ opacity: number; form: number }>;
@@ -62,6 +71,8 @@ export default function NetworkMesh({
   rotationSpeed?: number;
   onPick?: (index: number) => void;
   selected?: number;
+  /** phosphor-green highlights on glow + packets (explorer) */
+  accent?: boolean;
 }) {
   const group = useRef<THREE.Group>(null);
   const nodesRef = useRef<THREE.InstancedMesh>(null);
@@ -117,6 +128,15 @@ export default function NetworkMesh({
     }, [state]);
 
   const tmpColor = useMemo(() => new THREE.Color(), []);
+  const glowColor = useMemo(
+    () => (accent ? new THREE.Color(0.55, 2.4, 1.1) : new THREE.Color(1.9, 1.9, 1.9)),
+    [accent],
+  );
+  const selColor = useMemo(
+    () => (accent ? new THREE.Color(0.7, 3.0, 1.4) : new THREE.Color(2.6, 2.6, 2.6)),
+    [accent],
+  );
+  const kindColors = accent ? KIND_COLORS_ACCENT : KIND_COLORS;
 
   useFrame((_, dt) => {
     const { opacity, form } = progressRef.current;
@@ -148,8 +168,8 @@ export default function NetworkMesh({
         tmpColor.copy(baseColors[i]);
         const brightness = (1 + n.glow * 2.6) * opacity;
         tmpColor.multiplyScalar(brightness);
-        if (n.glow > 0.4) tmpColor.lerp(new THREE.Color(1.9, 1.9, 1.9), Math.min(n.glow - 0.4, 1) * 0.6);
-        if (i === selected) tmpColor.set(2.6, 2.6, 2.6);
+        if (n.glow > 0.4) tmpColor.lerp(glowColor, Math.min(n.glow - 0.4, 1) * 0.6);
+        if (i === selected) tmpColor.copy(selColor);
         mesh.setColorAt(i, tmpColor);
       }
       mesh.instanceMatrix.needsUpdate = true;
@@ -168,7 +188,7 @@ export default function NetworkMesh({
       const b = state.nodes[e.b];
       const tt = Math.max(0, Math.min(1, j.t));
       pos.setXYZ(i, a.x + (b.x - a.x) * tt, a.y + (b.y - a.y) * tt, a.z + (b.z - a.z) * tt);
-      const c = KIND_COLORS[j.kind];
+      const c = kindColors[j.kind];
       col.setXYZ(i, c[0], c[1], c[2]);
       siz.setX(i, j.size);
     }

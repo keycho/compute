@@ -403,6 +403,7 @@ export default function Explorer() {
           rotationSpeed={0.014}
           onPick={pickMeshNode}
           selected={meshSelected}
+          accent
         />
         <EffectComposer>
           <Bloom
@@ -427,7 +428,7 @@ export default function Explorer() {
         </div>
         <div className="glass reticle pointer-events-auto flex items-center gap-5 px-5 py-3.5">
           <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">
-            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-pos" aria-hidden />
+            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-[#4ade80]" aria-hidden />
             mainnet
           </span>
           <span className="hidden font-mono text-[11px] uppercase tracking-[0.12em] text-mute md:inline">
@@ -457,7 +458,11 @@ export default function Explorer() {
                 const s = itemStatusLabel(i);
                 const active = selected?.id === i.id;
                 const dot =
-                  i.kind === "job" ? "bg-signal" : i.kind === "worker" ? "bg-violet" : "bg-cyan";
+                  i.kind === "job"
+                    ? "bg-[#4ade80]"
+                    : i.kind === "worker"
+                      ? "bg-[rgba(255,255,255,0.85)]"
+                      : "bg-[#86efac]";
                 return (
                   <motion.button
                     key={i.id}
