@@ -6,10 +6,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Wordmark } from "@/components/ui/Logo";
 
 const LINKS = [
-  { label: "Run AI", href: "/run" },
-  { label: "Generate", href: "/generate" },
-  { label: "Share GPU", href: "/share" },
-  { label: "Stake Q0R", href: "/#token" },
+  { label: "Execute", href: "/execute" },
+  { label: "Create", href: "/create" },
+  { label: "Supply", href: "/supply" },
+  { label: "Stake", href: "/#token" },
   { label: "Network", href: "/#network" },
   { label: "Docs", href: "/#developers" },
 ];
@@ -53,10 +53,10 @@ export default function Nav() {
         <div className="hidden items-stretch lg:flex">
           <div className="mx-2 my-4 w-px bg-line" aria-hidden />
           <Link
-            href="/app"
+            href="/explore"
             className="my-3 inline-flex items-center gap-2 self-center rounded-[2px] bg-signal px-6 py-[10px] font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] hover:bg-signal-bright hover:shadow-[0_0_28px_rgba(91,124,255,0.4)]"
           >
-            Open Console
+            Explorer
             <span aria-hidden>→</span>
           </Link>
         </div>
@@ -104,10 +104,10 @@ export default function Nav() {
                 </a>
               ))}
               <Link
-                href="/app"
+                href="/explore"
                 className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-signal px-6 py-3.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507]"
               >
-                Open Console <span aria-hidden>→</span>
+                Explorer <span aria-hidden>→</span>
               </Link>
             </div>
           </motion.nav>

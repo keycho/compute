@@ -19,12 +19,15 @@ import { createNetwork, stepNetwork } from "@/lib/network";
 import { mulberry32 } from "@/lib/prng";
 import { useFeed } from "@/lib/useFeed";
 import type { EcoEvt, FeedItem, JobEntity, WorkerEntity } from "@/lib/feed";
+import { getReceipt, type Receipt } from "@/lib/receipts";
 import { bindPointer, viewState } from "@/lib/viewState";
 
 /**
- * The network console: a live event stream over the living mesh.
+ * The network explorer: a live event stream over the living mesh.
  * Every feed row is inspectable in place — clicking one opens a
- * block-explorer drawer with the structured truth of that event.
+ * block drawer with the structured truth of that event. Execution
+ * receipts from /execute and /create deep-link here via ?block=0x…,
+ * so the explorer is part of every interaction, not a separate app.
  * Locally true, globally incomplete: entities are snapshots the system
  * happens to know about, not a database view.
  */
@@ -50,7 +53,8 @@ function ConsoleRig() {
 type Sel =
   | { id: string; title: string; t: "job"; j: JobEntity }
   | { id: string; title: string; t: "worker"; w: WorkerEntity }
-  | { id: string; title: string; t: "eco"; e: EcoEvt };
+  | { id: string; title: string; t: "eco"; e: EcoEvt }
+  | { id: string; title: string; t: "receipt"; r: Receipt };
 
 function selFromItem(i: FeedItem): Sel {
   if (i.kind === "economy")
@@ -261,9 +265,48 @@ function EcoBlock({ e }: { e: EcoEvt }) {
   );
 }
 
-/* ---------- console ---------- */
+function ReceiptBlock({ r }: { r: Receipt }) {
+  return (
+    <>
+      <BlockSection title="task">
+        <Field k="type" v="user_execution" />
+        <Field
+          k="workload"
+          v={r.kind === "inference" ? `inference / ${r.model}` : `image_generation / ${r.model}`}
+          cls="text-ink"
+        />
+        <Field k="hash" v={r.hash} cls="text-signal" />
+        <Field k="status" v="completed" cls="text-pos" />
+        <Field k="finalized" v="false" />
+      </BlockSection>
+      <BlockSection title="execution">
+        <Field k="node" v={r.node} cls="text-ink" />
+        <Field k="gpu" v={r.gpu} />
+        <Field
+          k="runtime"
+          v={r.runtimeMs >= 1000 ? `${(r.runtimeMs / 1000).toFixed(1)}s` : `${Math.round(r.runtimeMs)}ms`}
+        />
+      </BlockSection>
+      <BlockSection title="result">
+        <Field k="verified" v="output accepted" cls="text-pos" />
+        <Field k="delivered to" v="this client" cls="text-mute" />
+      </BlockSection>
+      <BlockSection title="economics">
+        <Field k="cost" v={`${r.costUsdc.toFixed(4)} USDC`} cls="text-cyan" />
+        <Field k="settlement" v="batched · next epoch close" cls="text-mute" />
+      </BlockSection>
+      <BlockSection title="prompt">
+        <p className="font-mono text-[11.5px] leading-[1.8] text-dim">
+          {r.prompt.length > 180 ? `${r.prompt.slice(0, 180)}…` : r.prompt}
+        </p>
+      </BlockSection>
+    </>
+  );
+}
 
-export default function Console() {
+/* ---------- explorer ---------- */
+
+export default function Explorer() {
   const network = useMemo(() => {
     const net = createNetwork(72, "console-mesh");
     const warm = mulberry32(0xfa57);
@@ -285,6 +328,14 @@ export default function Console() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // "view block" on any execution receipt lands here with ?block=0x…
+  useEffect(() => {
+    const hash = new URLSearchParams(window.location.search).get("block");
+    if (!hash) return;
+    const r = getReceipt(hash);
+    if (r) setSelected({ id: `rc-${r.hash}`, title: `JOB ${r.hash}`, t: "receipt", r });
   }, []);
 
   // distinct job entities currently visible in the event window
@@ -370,7 +421,7 @@ export default function Console() {
             <Wordmark />
           </Link>
           <span className="hidden h-4 w-px bg-line md:block" aria-hidden />
-          <span className="chip hidden md:inline">NETWORK CONSOLE</span>
+          <span className="chip hidden md:inline">NETWORK EXPLORER</span>
         </div>
         <div className="glass reticle pointer-events-auto flex items-center gap-5 px-5 py-3.5">
           <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">
@@ -519,6 +570,7 @@ export default function Console() {
                   />
                 )}
                 {selected.t === "eco" && <EcoBlock e={selected.e} />}
+                {selected.t === "receipt" && <ReceiptBlock r={selected.r} />}
               </div>
               <div className="border-t border-line px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mute">
                 snapshot · locally true, globally incomplete

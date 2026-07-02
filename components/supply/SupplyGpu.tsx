@@ -129,7 +129,7 @@ function ShareFeed() {
   );
 }
 
-export default function ShareGpu() {
+export default function SupplyGpu() {
   return (
     <div className="mx-auto grid w-full max-w-[980px] gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14">
       {/* steps */}

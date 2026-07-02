@@ -3,9 +3,9 @@ import Nav from "@/components/sections/Nav";
 import Scramble from "@/components/ui/Scramble";
 
 /**
- * Shared chrome for the action surfaces (/run, /generate, /share):
+ * Shared chrome for the action surfaces (/execute, /create, /supply):
  * nav, a quiet ambient glow instead of the full WebGL journey, a small
- * header, and a footer strip that points at the console for depth.
+ * header, and a footer strip that points at the explorer for depth.
  */
 export default function ActionShell({
   chip,
@@ -44,8 +44,8 @@ export default function ActionShell({
         {children}
         <div className="mx-auto mt-14 flex w-full max-w-[780px] items-center justify-between border-t border-line pt-5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
           <span>powered by the q0r mesh · verified execution</span>
-          <Link href="/app" className="text-signal transition-colors hover:text-signal-bright">
-            watch it happen → console
+          <Link href="/explore" className="text-signal transition-colors hover:text-signal-bright">
+            every job lands in the explorer →
           </Link>
         </div>
       </main>

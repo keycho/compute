@@ -194,9 +194,12 @@ const GEN_NODES = ["nd-da01", "nd-77aa", "nd-4c1a", "nd-b068", "nd-d592", "nd-e5
 
 export function genMeta(prompt: string, style: StyleKey, aspect: AspectKey, variation: number) {
   const r = mulberry32(seedFor(prompt, style, aspect, variation) ^ 0x9e37);
+  const node = GEN_NODES[Math.floor(r() * GEN_NODES.length)];
+  const seed = Math.floor(r() * 0xffffff);
   return {
-    node: GEN_NODES[Math.floor(r() * GEN_NODES.length)],
-    seed: Math.floor(r() * 0xffffff),
+    node,
+    seed,
+    hash: `0x${seed.toString(16).padStart(6, "0")}`,
     ms: 2_400 + Math.floor(r() * 3_800),
     costUsdc: 0.01 + r() * 0.05,
   };

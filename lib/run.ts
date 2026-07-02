@@ -25,6 +25,7 @@ const NODES = [
 const GPUS = ["2× RTX 5090", "1× H100", "4× A100 80G", "1× B200", "2× MI300X"];
 
 export interface RunMeta {
+  hash: string;
   node: string;
   gpu: string;
   latencyLo: number;
@@ -102,6 +103,7 @@ export function synthesize(prompt: string, model: ModelKey): { text: string; met
   const text = paras.join("\n\n");
 
   const meta: RunMeta = {
+    hash: `0x${(seed >>> 0).toString(16).padStart(8, "0").slice(0, 6)}`,
     node: pick(NODES),
     gpu: pick(GPUS),
     latencyLo: 58 + Math.floor(r() * 30),

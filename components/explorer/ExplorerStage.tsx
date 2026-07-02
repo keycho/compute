@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-const Console = dynamic(() => import("./Console"), {
+const Explorer = dynamic(() => import("./Explorer"), {
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 flex items-center justify-center bg-bg">
@@ -11,6 +11,6 @@ const Console = dynamic(() => import("./Console"), {
   ),
 });
 
-export default function ConsoleStage() {
-  return <Console />;
+export default function ExplorerStage() {
+  return <Explorer />;
 }

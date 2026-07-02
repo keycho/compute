@@ -18,12 +18,12 @@ const plex = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "q0r — Run AI on People\u2019s GPUs",
+  title: "q0r — What Do You Want to Execute?",
   description:
-    "Run AI, generate images, share your GPU, earn from idle hardware. A decentralized mesh of independent GPUs quietly powers all of it.",
+    "Execute AI, create images, supply your GPU, stake Q0R. A decentralized mesh of independent GPUs runs it all — and every job leaves a verified receipt.",
   openGraph: {
     title: "q0r",
-    description: "Run AI. Generate images. Share your GPU. Earn from idle hardware.",
+    description: "Execute. Create. Supply. Stake. Compute, owned by people.",
     type: "website",
   },
 };

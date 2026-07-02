@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PipelineTrace from "@/components/ui/PipelineTrace";
+import Receipt from "@/components/ui/Receipt";
 import { PIPELINE } from "@/lib/run";
+import { saveReceipt } from "@/lib/receipts";
 import {
   ASPECTS,
   STYLES,
@@ -12,6 +14,15 @@ import {
   type AspectKey,
   type StyleKey,
 } from "@/lib/genart";
+
+const IMAGE_MODEL = "flux.1-schnell";
+
+// creation media — images ship today, the rest lands on the same pipeline
+const MEDIA = [
+  { key: "images", live: true },
+  { key: "video", live: false },
+  { key: "audio", live: false },
+] as const;
 
 interface Gen {
   id: number;
@@ -40,7 +51,21 @@ function Variation({
   const meta = genMeta(prompt, style, aspect, variation);
 
   useEffect(() => {
-    if (visible && ref.current) paint(ref.current, prompt, style, aspect, variation);
+    if (visible && ref.current) {
+      paint(ref.current, prompt, style, aspect, variation);
+      saveReceipt({
+        hash: meta.hash,
+        kind: "image",
+        prompt,
+        model: IMAGE_MODEL,
+        node: meta.node,
+        gpu: "1× RTX 5090",
+        runtimeMs: meta.ms,
+        costUsdc: meta.costUsdc,
+      });
+    }
+    // meta is derived deterministically from the same inputs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, prompt, style, aspect, variation]);
 
   const ar = ASPECTS.find((a) => a.key === aspect)!;
@@ -67,11 +92,28 @@ function Variation({
         </span>
         <span className="tnum">seed {meta.seed.toString(16)}</span>
       </figcaption>
+      {visible && (
+        <div className="border-t border-line px-3 py-2">
+          <Receipt
+            compact
+            receipt={{
+              hash: meta.hash,
+              kind: "image",
+              prompt,
+              model: IMAGE_MODEL,
+              node: meta.node,
+              gpu: "1× RTX 5090",
+              runtimeMs: meta.ms,
+              costUsdc: meta.costUsdc,
+            }}
+          />
+        </div>
+      )}
     </figure>
   );
 }
 
-export default function Generate() {
+export default function Create() {
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState<StyleKey>("aurora");
   const [aspect, setAspect] = useState<AspectKey>("1:1");
@@ -133,6 +175,25 @@ export default function Generate() {
         />
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3">
           <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-1.5" role="radiogroup" aria-label="Medium">
+              {MEDIA.map((m) => (
+                <button
+                  key={m.key}
+                  role="radio"
+                  aria-checked={m.live}
+                  disabled={!m.live}
+                  title={m.live ? undefined : "coming to the same pipeline"}
+                  className={`rounded-[2px] border px-3 py-1.5 font-mono text-[11px] ${
+                    m.live
+                      ? "border-[rgba(103,232,249,0.4)] bg-[rgba(103,232,249,0.07)] text-cyan"
+                      : "cursor-default border-line text-mute opacity-60"
+                  }`}
+                >
+                  {m.key}
+                  {!m.live && <span className="ml-1.5 text-[9px] uppercase">soon</span>}
+                </button>
+              ))}
+            </div>
             <div className="flex items-center gap-1.5" role="radiogroup" aria-label="Style">
               {STYLES.map((s) => (
                 <button
@@ -173,7 +234,7 @@ export default function Generate() {
             disabled={busy || !prompt.trim()}
             className="rounded-[2px] bg-signal px-7 py-2.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] enabled:hover:bg-signal-bright enabled:hover:shadow-[0_0_24px_rgba(91,124,255,0.4)] disabled:opacity-40"
           >
-            {busy ? "Generating…" : "Generate"}
+            {busy ? "Creating…" : "Create"}
           </button>
         </div>
       </div>
@@ -199,7 +260,7 @@ export default function Generate() {
               </p>
               <PipelineTrace stages={PIPELINE} active={g.stage} node={g.node} />
             </div>
-            <div className={`grid gap-3 ${g.aspect === "9:16" ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2"}`}>
+            <div className={`grid items-start gap-3 ${g.aspect === "9:16" ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2"}`}>
               {[0, 1, 2, 3].map((v) => (
                 <Variation
                   key={v}
@@ -217,7 +278,7 @@ export default function Generate() {
 
       {gens.length === 0 && (
         <p className="mt-6 font-mono text-[12px] text-mute">
-          four variations per run · deterministic per seed · executed across the mesh
+          four variations per run · deterministic per seed · every frame comes with a receipt
         </p>
       )}
     </div>
