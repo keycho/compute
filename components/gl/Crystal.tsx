@@ -57,9 +57,11 @@ export default function Crystal({
 }) {
   const group = useRef<THREE.Group>(null);
   const meshes = useRef<Array<THREE.Mesh | null>>([]);
+  const ringGroup = useRef<THREE.Group>(null);
+  const ringShards = useRef<Array<THREE.Mesh | null>>([]);
   const timeRef = useRef(0);
 
-  const { geometry, coreGeometry, blueMat, violetMat, coreMat, shards } = useMemo(() => {
+  const { geometry, coreGeometry, blueMat, violetMat, coreMat, shards, ringGeometry, ringMaterial } = useMemo(() => {
     const geometry = new THREE.OctahedronGeometry(1, 0).toNonIndexed();
     geometry.computeVertexNormals();
     const coreGeometry = new THREE.OctahedronGeometry(0.36, 1).toNonIndexed();
@@ -80,6 +82,25 @@ export default function Crystal({
       transparent: true,
     });
 
+    // thin orbit line: a ring of points joined as a loop
+    const RING_SEGS = 96;
+    const ringPts = new Float32Array(RING_SEGS * 3);
+    for (let i = 0; i < RING_SEGS; i++) {
+      const a = (i / RING_SEGS) * Math.PI * 2;
+      ringPts[i * 3] = Math.cos(a) * 2.45;
+      ringPts[i * 3 + 1] = 0;
+      ringPts[i * 3 + 2] = Math.sin(a) * 2.45;
+    }
+    const ringGeometry = new THREE.BufferGeometry();
+    ringGeometry.setAttribute("position", new THREE.BufferAttribute(ringPts, 3));
+    const ringMaterial = new THREE.LineBasicMaterial({
+      color: new THREE.Color(0.32, 0.42, 0.85),
+      transparent: true,
+      opacity: 0.28,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+
     const rand = mulberry32(0x5eed);
     const shards: Shard[] = [];
     for (let i = 0; i < SHARDS; i++) {
@@ -94,7 +115,7 @@ export default function Crystal({
         violet: rand() > 0.66,
       });
     }
-    return { geometry, coreGeometry, blueMat, violetMat, coreMat, shards };
+    return { geometry, coreGeometry, blueMat, violetMat, coreMat, shards, ringGeometry, ringMaterial };
   }, []);
 
   useFrame((_, dt) => {
@@ -129,6 +150,22 @@ export default function Crystal({
     blueMat.uniforms.uOpacity.value = opacity;
     violetMat.uniforms.uOpacity.value = opacity;
     coreMat.opacity = opacity * (0.75 + Math.sin(t * 1.7) * 0.15) * (1 - ease);
+
+    // orbit ring: counter-rotates, dissolves first when the core shatters
+    if (ringGroup.current) {
+      ringGroup.current.rotation.y = -t * 0.2;
+      ringGroup.current.rotation.z = 0.42 + Math.sin(t * 0.13) * 0.05;
+      ringGroup.current.scale.setScalar(1 + ease * 1.6);
+    }
+    ringMaterial.opacity = 0.28 * opacity * (1 - ease);
+    for (let i = 0; i < ringShards.current.length; i++) {
+      const m = ringShards.current[i];
+      if (!m) continue;
+      const a = (i / 10) * Math.PI * 2 + t * 0.2;
+      m.position.set(Math.cos(a) * 2.45, 0, Math.sin(a) * 2.45);
+      m.rotation.y = a + t * 0.6;
+      m.scale.setScalar(0.055 * (1 + Math.sin(t * 1.2 + i) * 0.18) * (1 - ease));
+    }
   });
 
   return (
@@ -144,6 +181,19 @@ export default function Crystal({
           material={shards[i].violet ? violetMat : blueMat}
         />
       ))}
+      <group ref={ringGroup}>
+        <lineLoop geometry={ringGeometry} material={ringMaterial} />
+        {Array.from({ length: 10 }, (_, i) => (
+          <mesh
+            key={`ring-${i}`}
+            ref={(el) => {
+              ringShards.current[i] = el;
+            }}
+            geometry={geometry}
+            material={i % 3 === 0 ? violetMat : blueMat}
+          />
+        ))}
+      </group>
     </group>
   );
 }

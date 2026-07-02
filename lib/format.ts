@@ -1,5 +1,5 @@
 /**
- * Numeric formatting for market surfaces.
+ * Numeric formatting for protocol surfaces.
  * Terminal conventions: tabular figures, explicit signs, compact magnitudes.
  */
 
@@ -26,11 +26,6 @@ export function fmtCompact(v: number, prefix = "$"): string {
 export function fmtPct(v: number, digits = 2): string {
   const sign = v > 0 ? "+" : "";
   return `${sign}${v.toFixed(digits)}%`;
-}
-
-export function fmtFunding(v: number): string {
-  const sign = v > 0 ? "+" : "";
-  return `${sign}${(v * 100).toFixed(4)}%`;
 }
 
 export function fmtLatency(ms: number): string {

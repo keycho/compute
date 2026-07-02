@@ -3,25 +3,29 @@ import Reveal from "@/components/ui/Reveal";
 const FACTS = [
   {
     n: "01",
-    title: "Every market clears on-chain.",
-    body: "Orders match in the sequencer and settle to the ledger in a single batch. No custodian sits between a position and its collateral.",
+    title: "Workloads route themselves.",
+    body: "Applications submit jobs to the protocol. Discovery, placement, and failover happen in-network, weighted by latency, stake, and demand signals.",
   },
   {
     n: "02",
-    title: "Prices track physical capacity.",
-    body: "The utilization oracle aggregates signed telemetry from GPU providers. Funding pushes perpetuals toward the real cost of compute.",
+    title: "Every result is verified.",
+    body: "Execution runs in attested environments and returns proofs. The network settles what it can verify and rejects what it cannot.",
   },
   {
     n: "03",
-    title: "Capacity is a bearer asset.",
-    body: "Tokenized compute credits redeem for scheduled GPU time. They transfer, collateralize, and price like any other on-chain asset.",
+    title: "Rewards settle automatically.",
+    body: "Providers earn per verified unit of work, weighted by utilization, reliability, and response consistency. No invoices, no intermediaries.",
   },
 ];
 
 export default function SystemStrip() {
   return (
-    <section className="hairline-b">
-      <div className="container-x grid gap-0 md:grid-cols-3">
+    <section className="hairline-b relative">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[rgba(3,3,4,0.55)]"
+      />
+      <div className="container-x relative grid gap-0 md:grid-cols-3">
         {FACTS.map((f, i) => (
           <Reveal
             key={f.n}

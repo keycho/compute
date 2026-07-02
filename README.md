@@ -1,16 +1,15 @@
-# Compute Markets
+# q0r
 
-The financial layer for compute. An on-chain exchange where GPU capacity
-clears as a financial asset: perpetual futures, tokenized compute credits,
-and AI infrastructure indexes, settled against live utilization data from
-the network oracle.
+The execution layer for decentralized compute. Applications submit
+workloads; the protocol discovers providers, routes execution, verifies
+every result, and settles rewards automatically.
 
 ## Surfaces
 
-- `/` — the exchange. A scroll-choreographed WebGL journey through the
-  protocol: crystalline core → provider mesh → data streams, with a live
-  market terminal, institutional analytics, protocol mechanics, and the
-  developer surface floating above it as glass panels.
+- `/` — the protocol. A scroll-choreographed WebGL journey: crystalline
+  core → provider mesh → data streams, with live network telemetry,
+  network state, the execution pipeline, and the developer surface
+  floating above it as glass panels.
 - `/app` — the network console. The operational view of the mesh:
   providers as luminous nodes, jobs as energy packets in flight, earnings
   accumulating as light. Click a node to inspect it.
@@ -29,19 +28,21 @@ the network oracle.
 app/                 routes (/, /app)
 components/gl/       the WebGL layer: Scene (camera rig + choreography),
                      Crystal, Particles, NetworkMesh (shared with /app)
-components/sections/ nav, hero, terminal, ticker, features, analytics,
-                     protocol, developers, cta, footer
+components/sections/ nav, hero, telemetry, ticker, protocol pillars,
+                     network state, execution pipeline, developers, cta,
+                     footer
 components/console/  the /app network console + HUD
 components/ui/       primitives: Reveal, Scramble, Sparkline, DepthChart,
                      CountUp, SectionHeader, Button, Logo
-lib/                 seeded simulations (market engine, provider mesh),
-                     shared view state, formatting
+lib/                 the deterministic protocol simulation (provider
+                     mesh + derived metrics), shared view state, formatting
 docs/DESIGN.md       the design system: tokens, motion rules, scene map
 ```
 
-Every moving number on the site is driven by one seeded market engine and
-one seeded network simulation, so all surfaces observe the same tape and
-server/client first paints agree.
+Every moving number on the site derives from one deterministic protocol
+simulation: providers → capacity → throughput → queue depth → latency →
+rewards. All surfaces observe the same network state and server/client
+first paints agree.
 
 ## Other sites in this repo
 

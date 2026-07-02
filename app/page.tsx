@@ -5,7 +5,7 @@ import Hero from "@/components/sections/Hero";
 import Ticker from "@/components/sections/Ticker";
 import SystemStrip from "@/components/sections/SystemStrip";
 import Features from "@/components/sections/Features";
-import Analytics from "@/components/sections/Analytics";
+import NetworkState from "@/components/sections/NetworkState";
 import Protocol from "@/components/sections/Protocol";
 import Developers from "@/components/sections/Developers";
 import CtaBand from "@/components/sections/CtaBand";
@@ -21,7 +21,7 @@ export default function Home() {
         <Ticker />
         <SystemStrip />
         <Features />
-        <Analytics />
+        <NetworkState />
         <Protocol />
         <Developers />
         <CtaBand />

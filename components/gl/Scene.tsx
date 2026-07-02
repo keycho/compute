@@ -15,7 +15,7 @@ import NetworkMesh from "./NetworkMesh";
  * Scroll progress hands scenes to each other:
  *   0.00–0.14  core crystal idles (hero)
  *   0.10–0.26  shatter — shards fly outward, mesh forms out of them
- *   0.26–0.60  camera pushes into the living mesh (markets/analytics)
+ *   0.26–0.60  camera pushes into the living mesh (protocol/network state)
  *   0.60–0.82  particles align into vertical data streams (developers)
  *   0.82–1.00  everything dims toward the void (cta/footer)
  */
@@ -49,7 +49,7 @@ function Rig({
 
     meshProgress.current.form = smooth(0.14, 0.34, p);
     meshProgress.current.opacity =
-      smooth(0.14, 0.3, p) * (1 - smooth(0.62, 0.8, p) * 0.85) * dim;
+      smooth(0.14, 0.3, p) * (1 - smooth(0.62, 0.8, p) * 0.85) * dim * 0.85;
 
     const u = particleUniforms.current;
     if (u) {
@@ -94,8 +94,8 @@ export default function Scene() {
         dpr={[1, 1.75]}
         gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
         onCreated={({ gl, scene }) => {
-          gl.setClearColor("#050507");
-          scene.fog = new THREE.Fog("#050507", 8, 24);
+          gl.setClearColor("#030304");
+          scene.fog = new THREE.Fog("#030304", 7, 22);
         }}
       >
         <Suspense fallback={null}>
@@ -110,7 +110,7 @@ export default function Scene() {
           <EffectComposer>
             <Bloom
               mipmapBlur
-              intensity={0.72}
+              intensity={0.62}
               luminanceThreshold={0.26}
               luminanceSmoothing={0.32}
               radius={0.8}

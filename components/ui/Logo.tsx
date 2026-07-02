@@ -1,6 +1,6 @@
 /**
- * Mark: two interlocked tetra-facets forming an open "C" around a core —
- * a crystal seen down its axis. Pure geometry, no letterforms.
+ * Mark: interlocked facets around a routed core — a crystal seen down
+ * its axis. Pure geometry, no letterforms.
  */
 export default function Logo({ size = 26, className }: { size?: number; className?: string }) {
   return (
@@ -25,8 +25,8 @@ export function Wordmark({ className }: { className?: string }) {
   return (
     <span className={`flex items-center gap-3 ${className ?? ""}`}>
       <Logo />
-      <span className="font-display text-[17px] font-semibold tracking-[-0.01em] text-ink">
-        Compute<span className="text-mute">&nbsp;Markets</span>
+      <span className="font-display text-[18px] font-semibold tracking-[-0.01em] text-ink">
+        q0r<span className="font-mono text-[11px] font-normal uppercase tracking-[0.16em] text-mute">&nbsp;&nbsp;protocol</span>
       </span>
     </span>
   );
