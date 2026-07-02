@@ -10,7 +10,6 @@ const LINKS = [
   { label: "Create", href: "/create" },
   { label: "Supply", href: "/supply" },
   { label: "Stake", href: "/#token" },
-  { label: "Network", href: "/#network" },
   { label: "Docs", href: "/#developers" },
 ];
 

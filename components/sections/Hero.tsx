@@ -3,8 +3,6 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Scramble from "@/components/ui/Scramble";
-import { useFeed } from "@/lib/useFeed";
-import Telemetry from "./Telemetry";
 
 const ease = [0.7, 0, 0.3, 1] as const;
 
@@ -32,8 +30,6 @@ const enter = (delay: number) => ({
 });
 
 export default function Hero() {
-  const snap = useFeed();
-
   return (
     <section className="relative flex min-h-svh items-center pt-16" id="top">
       {/* readability scrim: keeps the left column legible over the scene */}
@@ -45,8 +41,8 @@ export default function Hero() {
             "radial-gradient(ellipse 92% 72% at 16% 50%, rgba(3,3,4,0.92), rgba(3,3,4,0.5) 55%, transparent 80%)",
         }}
       />
-      <div className="container-x relative grid w-full items-center gap-14 pb-24 pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
-        <div>
+      <div className="container-x relative w-full pb-24 pt-20">
+        <div className="max-w-[680px]">
           <motion.p {...enter(0.1)} className="chip mb-7">
             <Scramble text="COMPUTE, OWNED BY PEOPLE" duration={700} />
           </motion.p>
@@ -114,39 +110,7 @@ export default function Hero() {
               how it works ↓
             </Link>
           </motion.p>
-
-          <motion.div
-            {...enter(0.66)}
-            className="mt-14 flex flex-wrap gap-x-10 gap-y-4 font-mono text-[11px] uppercase tracking-[0.13em] text-mute"
-          >
-            <span>
-              <span className="tnum text-ink">{snap.approx.providersMasked}</span> active
-              providers
-            </span>
-            <span>
-              <span className="tnum text-ink">
-                ~{Math.round(snap.approx.jobsInFlightLo / 1000)}–
-                {Math.round(snap.approx.jobsInFlightHi / 1000)}k
-              </span>{" "}
-              jobs in flight
-            </span>
-            <span>
-              <span className="tnum text-ink">
-                {Math.round(snap.approx.latencyLo)}–{Math.round(snap.approx.latencyHi)}ms
-              </span>{" "}
-              latency · varies
-            </span>
-          </motion.div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 44, filter: "blur(12px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1.1, delay: 0.5, ease }}
-          className="flex justify-center lg:justify-end"
-        >
-          <Telemetry />
-        </motion.div>
       </div>
 
       {/* scroll cue */}

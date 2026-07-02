@@ -23,7 +23,7 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
     heading: "Explore",
     links: [
       { label: "Live explorer", href: "/explore" },
-      { label: "Network", href: "#network" },
+      { label: "Network", href: "/explore" },
       { label: "Blocks", href: "/explore" },
       { label: "Jobs", href: "/explore" },
     ],
@@ -58,9 +58,8 @@ export default function Footer() {
             The execution layer for decentralized compute. Workloads in,
             verified results out.
           </p>
-          <p className="mt-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">
-            <span className="h-1.5 w-1.5 rounded-full bg-pos animate-pulse-dot" aria-hidden />
-            All systems operational
+          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">
+            Every execution leaves a verified receipt
           </p>
         </div>
 
