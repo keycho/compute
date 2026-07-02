@@ -38,7 +38,7 @@ export default function Hero() {
         className="pointer-events-none absolute inset-y-0 left-0 w-[72%]"
         style={{
           background:
-            "radial-gradient(ellipse 92% 72% at 16% 50%, rgba(3,3,4,0.92), rgba(3,3,4,0.5) 55%, transparent 80%)",
+            "radial-gradient(ellipse 92% 72% at 16% 50%, rgba(6,6,6,0.92), rgba(6,6,6,0.5) 55%, transparent 80%)",
         }}
       />
       <div className="container-x relative w-full pb-24 pt-20">
@@ -73,8 +73,8 @@ export default function Hero() {
                 href={a.href}
                 className={`group rounded-[8px] border px-5 py-4 transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] ${
                   a.primary
-                    ? "border-[rgba(91,124,255,0.55)] bg-[rgba(91,124,255,0.1)] hover:bg-[rgba(91,124,255,0.16)] hover:shadow-[0_0_28px_rgba(91,124,255,0.25)]"
-                    : "border-line bg-[rgba(8,9,14,0.6)] hover:border-[rgba(91,124,255,0.4)] hover:bg-[rgba(91,124,255,0.05)]"
+                    ? "border-[rgba(255,255,255,0.55)] bg-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.16)] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
+                    : "border-line bg-[rgba(12,12,12,0.6)] hover:border-[rgba(255,255,255,0.4)] hover:bg-[rgba(255,255,255,0.05)]"
                 }`}
               >
                 <span className="flex items-center justify-between font-display text-[17px] font-semibold tracking-[-0.01em] text-ink">

@@ -37,7 +37,7 @@ const STEPS = [
 export default function HowItWorks() {
   return (
     <section className="hairline-t relative py-[clamp(110px,14vh,170px)]" id="how">
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[rgba(3,3,4,0.62)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[rgba(6,6,6,0.62)]" />
       <div className="relative">
         <SectionHeader
           chip="HOW IT WORKS"
@@ -57,7 +57,7 @@ export default function HowItWorks() {
               <div className="grid grid-cols-[56px_1fr] gap-x-6">
                 {/* rail: number + connector */}
                 <div className="flex flex-col items-center">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line-strong bg-[rgba(8,9,14,0.8)] font-mono text-[12px] text-signal-bright">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line-strong bg-[rgba(12,12,12,0.8)] font-mono text-[12px] text-signal-bright">
                     {s.n}
                   </span>
                   {i < STEPS.length - 1 && (

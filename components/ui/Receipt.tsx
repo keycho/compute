@@ -57,7 +57,7 @@ export default function Receipt({
             transition={{ duration: 0.35, ease: [0.7, 0, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="mt-2.5 rounded-[8px] border border-line bg-[rgba(8,9,14,0.88)]">
+            <div className="mt-2.5 rounded-[8px] border border-line bg-[rgba(12,12,12,0.88)]">
               <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
                 <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-ink">
                   execution receipt

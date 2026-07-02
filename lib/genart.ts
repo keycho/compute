@@ -25,23 +25,25 @@ export const ASPECTS = [
 ] as const;
 export type AspectKey = (typeof ASPECTS)[number]["key"];
 
+// monochrome palettes: [bright, mid, light, ground] — brightness bands
+// carry the composition, matching the black-and-white site identity
 const PALETTES: Record<StyleKey, string[][]> = {
   aurora: [
-    ["#5b7cff", "#8b5cf6", "#67e8f9", "#1b2450"],
-    ["#8b5cf6", "#5b7cff", "#f0abfc", "#131a3a"],
-    ["#67e8f9", "#5b7cff", "#8b5cf6", "#0d1c33"],
+    ["#f5f5f5", "#8f8f8f", "#c4c4c4", "#141414"],
+    ["#e0e0e0", "#a8a8a8", "#6f6f6f", "#0f0f0f"],
+    ["#ffffff", "#7a7a7a", "#b0b0b0", "#111111"],
   ],
   structure: [
-    ["#5b7cff", "#8fa8ff", "#26304f", "#0a0f22"],
-    ["#8b5cf6", "#5b7cff", "#2a2350", "#0e0a24"],
+    ["#e8e8e8", "#a0a0a0", "#2c2c2c", "#0a0a0a"],
+    ["#cfcfcf", "#8a8a8a", "#232323", "#080808"],
   ],
   organism: [
-    ["#67e8f9", "#34d399", "#5b7cff", "#0a1f26"],
-    ["#8b5cf6", "#fb7185", "#5b7cff", "#1d0f2a"],
+    ["#f0f0f0", "#b5b5b5", "#7d7d7d", "#101010"],
+    ["#d6d6d6", "#909090", "#696969", "#0c0c0c"],
   ],
   noir: [
-    ["#edf0f7", "#7b8294", "#5b7cff", "#0a0b10"],
-    ["#a7adbd", "#edf0f7", "#8b5cf6", "#08090d"],
+    ["#ededed", "#7b7b7b", "#ffffff", "#0a0a0a"],
+    ["#a7a7a7", "#ededed", "#8c8c8c", "#070707"],
   ],
 };
 
@@ -68,7 +70,7 @@ export function paint(
   // ground
   const base = ctx.createLinearGradient(0, 0, w * (0.4 + r() * 0.6), h);
   base.addColorStop(0, bg);
-  base.addColorStop(1, "#030304");
+  base.addColorStop(1, "#060606");
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, w, h);
 
@@ -81,7 +83,7 @@ export function paint(
     const rad = (0.18 + r() * 0.4) * Math.max(w, h);
     const g = ctx.createRadialGradient(x, y, 0, x, y, rad);
     const col = [c1, c2, c3][Math.floor(r() * 3)];
-    g.addColorStop(0, `${col}${Math.floor(46 + r() * 84).toString(16).padStart(2, "0")}`);
+    g.addColorStop(0, `${col}${Math.floor(74 + r() * 110).toString(16).padStart(2, "0")}`);
     g.addColorStop(1, `${col}00`);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
@@ -164,29 +166,28 @@ export function paint(
 
   // vignette
   const v = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.3, w / 2, h / 2, Math.max(w, h) * 0.75);
-  v.addColorStop(0, "rgba(3,3,4,0)");
-  v.addColorStop(1, "rgba(3,3,4,0.55)");
+  v.addColorStop(0, "rgba(6,6,6,0)");
+  v.addColorStop(1, "rgba(6,6,6,0.55)");
   ctx.fillStyle = v;
   ctx.fillRect(0, 0, w, h);
 
-  // grain — painted on an offscreen layer so it overlays instead of
-  // replacing (putImageData ignores compositing entirely)
-  const off = document.createElement("canvas");
-  off.width = w;
-  off.height = h;
-  const octx = off.getContext("2d");
-  if (octx) {
-    const grain = octx.createImageData(w, h);
-    const d = grain.data;
-    for (let i = 0; i < d.length; i += 4) {
-      const n = (r() * 255) | 0;
-      d[i] = d[i + 1] = d[i + 2] = n;
-      d[i + 3] = 18;
-    }
-    octx.putImageData(grain, 0, 0);
-    ctx.globalAlpha = 0.55;
-    ctx.drawImage(off, 0, 0);
-    ctx.globalAlpha = 1;
+  // pixelate: downsample to a coarse grid and upscale nearest-neighbor.
+  // the block structure replaces grain as the texture — same abstract
+  // pixel language as the site's WebGL layer. deterministic, so the
+  // seed still reproduces the exact frame.
+  const PX = 6;
+  const pw = Math.max(1, Math.round(w / PX));
+  const ph = Math.max(1, Math.round(h / PX));
+  const small = document.createElement("canvas");
+  small.width = pw;
+  small.height = ph;
+  const sctx = small.getContext("2d");
+  if (sctx) {
+    sctx.drawImage(canvas, 0, 0, pw, ph);
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(small, 0, 0, pw, ph, 0, 0, w, h);
+    ctx.imageSmoothingEnabled = true;
   }
 }
 

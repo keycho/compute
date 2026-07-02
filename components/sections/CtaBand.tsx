@@ -11,7 +11,7 @@ export default function CtaBand() {
         className="pointer-events-none absolute left-1/2 top-1/2 h-[560px] w-[1100px] -translate-x-1/2 -translate-y-1/2"
         style={{
           background:
-            "radial-gradient(closest-side, rgba(91,124,255,0.13), rgba(139,92,246,0.06) 55%, transparent 75%)",
+            "radial-gradient(closest-side, rgba(255,255,255,0.13), rgba(255,255,255,0.06) 55%, transparent 75%)",
         }}
       />
       <div className="container-x relative flex flex-col items-center py-[clamp(130px,18vh,210px)] text-center">

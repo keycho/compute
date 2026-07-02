@@ -253,7 +253,7 @@ export default function Developers() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(3,3,4,0.66), rgba(3,3,4,0.45) 50%, rgba(3,3,4,0.7))",
+            "linear-gradient(to bottom, rgba(6,6,6,0.66), rgba(6,6,6,0.45) 50%, rgba(6,6,6,0.7))",
         }}
       />
       <div className="relative">
@@ -296,9 +296,9 @@ export default function Developers() {
               {/* window chrome */}
               <div className="flex items-center justify-between border-b border-line px-5 py-3">
                 <div className="flex gap-1.5" aria-hidden>
-                  <span className="h-2.5 w-2.5 rounded-full bg-[rgba(235,240,255,0.12)]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[rgba(235,240,255,0.12)]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[rgba(91,124,255,0.55)]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[rgba(255,255,255,0.12)]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[rgba(255,255,255,0.12)]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[rgba(255,255,255,0.55)]" />
                 </div>
                 <div className="flex gap-1">
                   {(Object.keys(SNIPPETS) as Array<keyof typeof SNIPPETS>).map((k) => (
@@ -307,7 +307,7 @@ export default function Developers() {
                       onClick={() => setTab(k)}
                       className={`rounded-[2px] px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.1em] transition-colors duration-150 ${
                         tab === k
-                          ? "bg-[rgba(91,124,255,0.12)] text-signal-bright"
+                          ? "bg-[rgba(255,255,255,0.12)] text-signal-bright"
                           : "text-mute hover:text-dim"
                       }`}
                     >

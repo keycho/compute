@@ -27,8 +27,8 @@ export default function Button({
     size === "lg" ? "px-9 py-[17px] text-[13px]" : "px-7 py-[13px] text-[12px]";
   const look =
     variant === "primary"
-      ? "bg-signal text-[#050507] font-medium hover:bg-signal-bright hover:shadow-[0_0_32px_rgba(91,124,255,0.45)]"
-      : "border border-line-strong text-ink hover:border-[rgba(91,124,255,0.55)] hover:shadow-[0_0_24px_rgba(91,124,255,0.2)] hover:text-signal-bright";
+      ? "bg-signal text-[#050505] font-medium hover:bg-signal-bright hover:shadow-[0_0_32px_rgba(255,255,255,0.45)]"
+      : "border border-line-strong text-ink hover:border-[rgba(255,255,255,0.55)] hover:shadow-[0_0_24px_rgba(255,255,255,0.2)] hover:text-signal-bright";
 
   return (
     <Link href={href} className={`${base} ${sizing} ${look} ${className}`}>

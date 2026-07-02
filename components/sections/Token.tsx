@@ -46,7 +46,7 @@ export default function Token() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(3,3,4,0.64), rgba(3,3,4,0.44) 50%, rgba(3,3,4,0.68))",
+            "linear-gradient(to bottom, rgba(6,6,6,0.64), rgba(6,6,6,0.44) 50%, rgba(6,6,6,0.68))",
         }}
       />
       <div className="container-x relative">

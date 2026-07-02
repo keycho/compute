@@ -47,7 +47,7 @@ const COLUMNS: Array<{
 export default function Capabilities() {
   return (
     <section className="hairline-t hairline-b relative" id="capabilities">
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[rgba(3,3,4,0.66)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[rgba(6,6,6,0.66)]" />
       <div className="container-x relative grid gap-12 py-[clamp(70px,9vh,110px)] md:grid-cols-3 md:gap-10">
         {COLUMNS.map((col, i) => (
           <Reveal key={col.heading} delay={i * 0.08}>
@@ -69,7 +69,7 @@ export default function Capabilities() {
                       <span
                         className={`rounded-[3px] border px-1.5 py-0.5 font-mono text-[9.5px] uppercase tracking-[0.1em] ${
                           item.tag === "beta"
-                            ? "border-[rgba(103,232,249,0.35)] text-cyan"
+                            ? "border-[rgba(255,255,255,0.35)] text-cyan"
                             : "border-line text-mute"
                         }`}
                       >

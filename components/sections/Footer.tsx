@@ -50,7 +50,7 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
 
 export default function Footer() {
   return (
-    <footer className="hairline-t relative overflow-hidden bg-[rgba(3,3,4,0.82)] backdrop-blur-[6px]">
+    <footer className="hairline-t relative overflow-hidden bg-[rgba(6,6,6,0.82)] backdrop-blur-[6px]">
       <div className="container-x grid gap-12 py-20 md:grid-cols-[1.2fr_repeat(5,1fr)]">
         <div>
           <Wordmark />

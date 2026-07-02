@@ -204,7 +204,7 @@ function WorkerBlock({
           <span className="text-mute">→</span> {w.loadHist[2]}%{" "}
           <span className="text-mute">(fluctuating)</span>
         </p>
-        <div className="mt-2 h-[4px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.06)]">
+        <div className="mt-2 h-[4px] overflow-hidden rounded-full bg-[rgba(255,255,255,0.06)]">
           <div
             className={`h-full rounded-full transition-[width] duration-1000 ${
               w.status === "unstable" || w.status === "throttling" || w.status === "offline"
@@ -226,7 +226,7 @@ function WorkerBlock({
           <button
             key={j.id}
             onClick={() => onPickJob(j)}
-            className="flex w-full items-baseline justify-between py-[5px] text-left hover:bg-[rgba(235,240,255,0.03)]"
+            className="flex w-full items-baseline justify-between py-[5px] text-left hover:bg-[rgba(255,255,255,0.03)]"
           >
             <span className="font-mono text-[11.5px] text-signal">{j.hash}</span>
             <span className={`font-mono text-[11px] ${PHASE_CLS[j.phase] ?? "text-dim"}`}>
@@ -380,17 +380,19 @@ export default function Explorer() {
       {/* the system */}
       <Canvas
         camera={{ fov: 46, near: 0.1, far: 60, position: [0, 0, 10.6] }}
-        dpr={[1, 1.75]}
+        // low-res + nearest-neighbor upscale (.pixelated): abstract pixel
+        // mesh behind the crisp DOM panels; picking is unaffected
+        dpr={0.42}
         gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
         onCreated={({ gl, scene }) => {
-          gl.setClearColor("#030304");
-          scene.fog = new THREE.Fog("#030304", 8, 26);
+          gl.setClearColor("#060606");
+          scene.fog = new THREE.Fog("#060606", 8, 26);
         }}
         onPointerMissed={() => {
           setSelected(null);
           setMeshSelected(-1);
         }}
-        className="absolute inset-0"
+        className="pixelated absolute inset-0"
       >
         <ConsoleRig />
         <NetworkMesh
@@ -469,7 +471,7 @@ export default function Explorer() {
                     }}
                     aria-pressed={active}
                     className={`grid w-full grid-cols-[8px_1fr_auto] items-baseline gap-x-2.5 rounded-[6px] px-2.5 py-[6px] text-left transition-colors duration-150 ${
-                      active ? "bg-[rgba(91,124,255,0.08)]" : "hover:bg-[rgba(235,240,255,0.03)]"
+                      active ? "bg-[rgba(255,255,255,0.08)]" : "hover:bg-[rgba(255,255,255,0.03)]"
                     }`}
                   >
                     <span className={`h-1.5 w-1.5 self-center rounded-full ${dot}`} aria-hidden />

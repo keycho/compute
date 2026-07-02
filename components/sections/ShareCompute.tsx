@@ -70,7 +70,7 @@ export default function ShareCompute() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(3,3,4,0.7), rgba(3,3,4,0.45) 50%, rgba(3,3,4,0.66))",
+            "linear-gradient(to bottom, rgba(6,6,6,0.7), rgba(6,6,6,0.45) 50%, rgba(6,6,6,0.66))",
         }}
       />
       <div className="relative">

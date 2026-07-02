@@ -75,10 +75,10 @@ export default function Crystal({
         transparent: true,
         depthWrite: true,
       });
-    const blueMat = mk(new THREE.Color(0.28, 0.42, 1.0));
-    const violetMat = mk(new THREE.Color(0.5, 0.32, 0.95));
+    const blueMat = mk(new THREE.Color(0.85, 0.85, 0.85));
+    const violetMat = mk(new THREE.Color(0.42, 0.42, 0.42));
     const coreMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(2.2, 2.6, 4.2), // HDR-bright: bloom halo
+      color: new THREE.Color(3.0, 3.0, 3.0), // HDR-bright: bloom halo
       transparent: true,
     });
 
@@ -94,7 +94,7 @@ export default function Crystal({
     const ringGeometry = new THREE.BufferGeometry();
     ringGeometry.setAttribute("position", new THREE.BufferAttribute(ringPts, 3));
     const ringMaterial = new THREE.LineBasicMaterial({
-      color: new THREE.Color(0.32, 0.42, 0.85),
+      color: new THREE.Color(0.55, 0.55, 0.55),
       transparent: true,
       opacity: 0.28,
       blending: THREE.AdditiveBlending,

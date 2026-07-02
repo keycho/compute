@@ -88,14 +88,16 @@ export default function Scene() {
   const meshProgress = useRef({ opacity: 0, form: 0 });
 
   return (
-    <div className="fixed inset-0 -z-10" aria-hidden>
+    <div className="pixelated fixed inset-0 -z-10" aria-hidden>
       <Canvas
         camera={{ fov: 42, near: 0.1, far: 60, position: [0, 0, 10] }}
-        dpr={[1, 1.75]}
+        // rendered small and upscaled nearest-neighbor (.pixelated): the
+        // scene reads as abstract pixel structure behind the crisp DOM text
+        dpr={0.3}
         gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
         onCreated={({ gl, scene }) => {
-          gl.setClearColor("#030304");
-          scene.fog = new THREE.Fog("#030304", 7, 22);
+          gl.setClearColor("#060606");
+          scene.fog = new THREE.Fog("#060606", 7, 22);
         }}
       >
         <Suspense fallback={null}>

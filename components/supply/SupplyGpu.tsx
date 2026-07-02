@@ -138,7 +138,7 @@ export default function SupplyGpu() {
           <Reveal key={s.title} delay={i * 0.05}>
             <div className="grid grid-cols-[44px_1fr] gap-x-5">
               <div className="flex flex-col items-center">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line-strong bg-[rgba(8,9,14,0.8)] font-mono text-[11px] text-signal-bright">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line-strong bg-[rgba(12,12,12,0.8)] font-mono text-[11px] text-signal-bright">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 {i < STEPS.length - 1 && (
@@ -155,7 +155,7 @@ export default function SupplyGpu() {
                 </h3>
                 <p className="mt-1.5 font-mono text-[12.5px] leading-[1.7] text-mute">{s.body}</p>
                 {s.code && (
-                  <code className="mt-2.5 inline-block rounded-[6px] border border-line bg-[rgba(8,9,14,0.85)] px-3.5 py-2 font-mono text-[12px] text-cyan">
+                  <code className="mt-2.5 inline-block rounded-[6px] border border-line bg-[rgba(12,12,12,0.85)] px-3.5 py-2 font-mono text-[12px] text-cyan">
                     $ {s.code}
                   </code>
                 )}

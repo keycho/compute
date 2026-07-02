@@ -71,7 +71,7 @@ function Variation({
   const ar = ASPECTS.find((a) => a.key === aspect)!;
 
   return (
-    <figure className="overflow-hidden rounded-[10px] border border-line bg-[rgba(8,9,14,0.8)]">
+    <figure className="overflow-hidden rounded-[10px] border border-line bg-[rgba(12,12,12,0.8)]">
       <div className="relative w-full" style={{ aspectRatio: `${ar.w} / ${ar.h}` }}>
         {visible ? (
           <motion.canvas
@@ -82,7 +82,7 @@ function Variation({
             className="absolute inset-0 h-full w-full"
           />
         ) : (
-          <div className="absolute inset-0 animate-pulse-dot bg-[rgba(91,124,255,0.05)]" />
+          <div className="absolute inset-0 animate-pulse-dot bg-[rgba(255,255,255,0.05)]" />
         )}
       </div>
       <figcaption className="flex items-center justify-between border-t border-line px-3 py-2 font-mono text-[9.5px] uppercase tracking-[0.08em] text-mute">
@@ -185,7 +185,7 @@ export default function Create() {
                   title={m.live ? undefined : "coming to the same pipeline"}
                   className={`rounded-[2px] border px-3 py-1.5 font-mono text-[11px] ${
                     m.live
-                      ? "border-[rgba(103,232,249,0.4)] bg-[rgba(103,232,249,0.07)] text-cyan"
+                      ? "border-[rgba(255,255,255,0.4)] bg-[rgba(255,255,255,0.07)] text-cyan"
                       : "cursor-default border-line text-mute opacity-60"
                   }`}
                 >
@@ -203,7 +203,7 @@ export default function Create() {
                   onClick={() => setStyle(s.key)}
                   className={`rounded-[2px] border px-3 py-1.5 font-mono text-[11px] transition-colors duration-150 ${
                     style === s.key
-                      ? "border-[rgba(139,92,246,0.55)] bg-[rgba(139,92,246,0.12)] text-violet"
+                      ? "border-[rgba(255,255,255,0.55)] bg-[rgba(255,255,255,0.12)] text-violet"
                       : "border-line text-mute hover:text-dim"
                   }`}
                 >
@@ -220,7 +220,7 @@ export default function Create() {
                   onClick={() => setAspect(a.key)}
                   className={`rounded-[2px] border px-2.5 py-1.5 font-mono text-[11px] transition-colors duration-150 ${
                     aspect === a.key
-                      ? "border-[rgba(91,124,255,0.5)] bg-[rgba(91,124,255,0.1)] text-signal-bright"
+                      ? "border-[rgba(255,255,255,0.5)] bg-[rgba(255,255,255,0.1)] text-signal-bright"
                       : "border-line text-mute hover:text-dim"
                   }`}
                 >
@@ -232,7 +232,7 @@ export default function Create() {
           <button
             onClick={generate}
             disabled={busy || !prompt.trim()}
-            className="rounded-[2px] bg-signal px-7 py-2.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] enabled:hover:bg-signal-bright enabled:hover:shadow-[0_0_24px_rgba(91,124,255,0.4)] disabled:opacity-40"
+            className="rounded-[2px] bg-signal px-7 py-2.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050505] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] enabled:hover:bg-signal-bright enabled:hover:shadow-[0_0_24px_rgba(255,255,255,0.4)] disabled:opacity-40"
           >
             {busy ? "Creating…" : "Create"}
           </button>

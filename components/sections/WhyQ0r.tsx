@@ -11,7 +11,7 @@ const NETWORK_FACTS = [
 export default function WhyQ0r() {
   return (
     <section className="hairline-b relative" id="why">
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[rgba(3,3,4,0.62)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[rgba(6,6,6,0.62)]" />
       <div className="container-x relative py-[clamp(90px,11vh,140px)]">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
           <Reveal>
