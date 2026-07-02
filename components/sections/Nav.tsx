@@ -6,12 +6,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Wordmark } from "@/components/ui/Logo";
 
 const LINKS = [
-  { label: "Why q0r", href: "#why" },
-  { label: "Providers", href: "#providers" },
-  { label: "Workloads", href: "#workloads" },
-  { label: "How it works", href: "#how" },
-  { label: "Network", href: "#network" },
-  { label: "Token", href: "#token" },
+  { label: "Run AI", href: "/run" },
+  { label: "Generate", href: "/generate" },
+  { label: "Share GPU", href: "/share" },
+  { label: "Stake Q0R", href: "/#token" },
+  { label: "Network", href: "/#network" },
+  { label: "Docs", href: "/#developers" },
 ];
 
 export default function Nav() {
@@ -56,7 +56,7 @@ export default function Nav() {
             href="/app"
             className="my-3 inline-flex items-center gap-2 self-center rounded-[2px] bg-signal px-6 py-[10px] font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] hover:bg-signal-bright hover:shadow-[0_0_28px_rgba(91,124,255,0.4)]"
           >
-            Launch App
+            Open Console
             <span aria-hidden>→</span>
           </Link>
         </div>
@@ -107,7 +107,7 @@ export default function Nav() {
                 href="/app"
                 className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-signal px-6 py-3.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507]"
               >
-                Launch App <span aria-hidden>→</span>
+                Open Console <span aria-hidden>→</span>
               </Link>
             </div>
           </motion.nav>
