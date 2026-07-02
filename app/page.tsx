@@ -3,10 +3,12 @@ import SmoothScroll from "@/components/providers/SmoothScroll";
 import Nav from "@/components/sections/Nav";
 import Hero from "@/components/sections/Hero";
 import Ticker from "@/components/sections/Ticker";
-import SystemStrip from "@/components/sections/SystemStrip";
-import Features from "@/components/sections/Features";
+import WhyQ0r from "@/components/sections/WhyQ0r";
+import ShareCompute from "@/components/sections/ShareCompute";
+import Workloads from "@/components/sections/Workloads";
+import HowItWorks from "@/components/sections/HowItWorks";
 import NetworkState from "@/components/sections/NetworkState";
-import Protocol from "@/components/sections/Protocol";
+import Token from "@/components/sections/Token";
 import Developers from "@/components/sections/Developers";
 import CtaBand from "@/components/sections/CtaBand";
 import Footer from "@/components/sections/Footer";
@@ -19,10 +21,12 @@ export default function Home() {
       <main>
         <Hero />
         <Ticker />
-        <SystemStrip />
-        <Features />
+        <WhyQ0r />
+        <ShareCompute />
+        <Workloads />
+        <HowItWorks />
         <NetworkState />
-        <Protocol />
+        <Token />
         <Developers />
         <CtaBand />
       </main>

@@ -17,29 +17,30 @@ export default function CtaBand() {
       <div className="container-x relative flex flex-col items-center py-[clamp(130px,18vh,210px)] text-center">
         <Reveal>
           <p className="chip mb-7">
-            <Scramble text="MAINNET IS LIVE" />
+            <Scramble text="THE NETWORK IS LIVE" />
           </p>
         </Reveal>
         <Reveal delay={0.1}>
           <h2 className="display text-[clamp(2.6rem,6vw,5.4rem)]">
-            Plug into the
+            Run your first job
             <br />
-            network<span className="text-signal">.</span>
+            today<span className="text-signal">.</span>
           </h2>
         </Reveal>
         <Reveal delay={0.2}>
           <p className="mx-auto mt-7 max-w-[480px] font-mono text-[14px] leading-[1.75] text-dim">
-            Capacity is online. Routing is live. The mesh is verifying work
-            right now — your first job is one request away.
+            Capacity is online and the mesh is verifying work right now.
+            Submit a workload in minutes, or point your idle GPUs at the
+            network and start earning.
           </p>
         </Reveal>
         <Reveal delay={0.3}>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Button href="/app" size="lg">
-              Launch Console <span aria-hidden>→</span>
+              Launch App <span aria-hidden>→</span>
             </Button>
-            <Button href="#developers" size="lg" variant="ghost">
-              Read the docs
+            <Button href="#providers" size="lg" variant="ghost">
+              Share your compute
             </Button>
           </div>
         </Reveal>

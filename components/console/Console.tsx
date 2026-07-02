@@ -302,7 +302,7 @@ export default function Console() {
                     <span className="text-faint">session rewards</span>
                     <CountUp
                       value={node.earnings}
-                      format={(v) => `${v.toFixed(1)} Q0R`}
+                      format={(v) => `${v.toFixed(2)} USDC`}
                       className="text-cyan"
                     />
                   </div>

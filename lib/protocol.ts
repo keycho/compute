@@ -52,7 +52,12 @@ export interface ProtocolSnapshot {
   /** aggregate metrics, all derived from mesh state */
   providers: number;
   activeGpus: number;
+  availableGpus: number;
   availablePflops: number;
+  /** total capacity, allocated + free */
+  capacityPflops: number;
+  /** composite of verification and provider reliability, 0..100 */
+  networkHealth: number;
   throughputJobsMin: number;
   queueDepth: number;
   medianLatencyMs: number;
@@ -196,15 +201,19 @@ class ProtocolEngine {
       }))
       .sort((a, b) => b.pflops - a.pflops);
 
+    const verificationRate = Math.min(99.999, 99.2 + reliability * 0.8 - queuePressure * 0.04);
     return {
       tick: this.tick,
       providers: nodes.length * SCALE + Math.round(Math.sin(this.tick / 60) * 26),
       activeGpus,
+      availableGpus,
       availablePflops: availableGpus * TFLOPS_PER_GPU * 1e-3,
+      capacityPflops: totalGpus * TFLOPS_PER_GPU * 1e-3,
+      networkHealth: Math.min(100, verificationRate * 0.6 + reliability * 100 * 0.4),
       throughputJobsMin: this.throughputEma,
       queueDepth: this.queue,
       medianLatencyMs,
-      verificationRate: Math.min(99.999, 99.2 + reliability * 0.8 - queuePressure * 0.04),
+      verificationRate,
       utilization: util,
       jobsExecuted: 2_800_000 + (this.network.totalJobs - 184_302) * SCALE,
       epochRewards: (this.network.settledUsd - 96_412_770) * SCALE * 0.011,
