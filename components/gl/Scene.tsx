@@ -109,6 +109,16 @@ export default function Scene() {
           </EffectComposer>
         </Suspense>
       </Canvas>
+      {/* overlay gradient: mutes the scene everywhere so text always
+          wins — heaviest on the left where copy lives, plus a global
+          veil. the constellation stays ambient, never competing. */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(6,6,6,0.9) 0%, rgba(6,6,6,0.72) 32%, rgba(6,6,6,0.42) 58%, rgba(6,6,6,0.52) 100%), linear-gradient(180deg, rgba(6,6,6,0.4) 0%, rgba(6,6,6,0.12) 35%, rgba(6,6,6,0.5) 100%)",
+        }}
+      />
     </div>
   );
 }
