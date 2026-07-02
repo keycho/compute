@@ -18,18 +18,18 @@ const plex = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Compute Markets — The Financial Layer for Compute",
+  title: "q0r — The Execution Layer for Decentralized Compute",
   description:
-    "An on-chain exchange where compute is a financial asset. Trade GPU perpetuals, tokenized compute credits, and AI infrastructure indexes settled against live network data.",
+    "q0r is a decentralized execution protocol. Applications submit workloads; the network discovers providers, routes execution, verifies results, and settles rewards automatically.",
   openGraph: {
-    title: "Compute Markets",
-    description: "The financial layer for compute.",
+    title: "q0r",
+    description: "The execution layer for decentralized compute.",
     type: "website",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050507",
+  themeColor: "#030304",
   width: "device-width",
   initialScale: 1,
 };

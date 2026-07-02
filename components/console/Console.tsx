@@ -137,8 +137,8 @@ export default function Console() {
         dpr={[1, 1.75]}
         gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
         onCreated={({ gl, scene }) => {
-          gl.setClearColor("#050507");
-          scene.fog = new THREE.Fog("#050507", 8, 26);
+          gl.setClearColor("#030304");
+          scene.fog = new THREE.Fog("#030304", 8, 26);
         }}
         className="absolute inset-0"
       >
@@ -163,7 +163,7 @@ export default function Console() {
         {/* top bar */}
         <div className="flex items-start justify-between gap-4">
           <Panel className="flex items-center gap-5 px-5 py-3">
-            <Link href="/" className="pointer-events-auto" aria-label="Back to exchange">
+            <Link href="/" className="pointer-events-auto" aria-label="Back to overview">
               <Wordmark />
             </Link>
             <span className="hidden h-4 w-px bg-line md:block" aria-hidden />
@@ -181,7 +181,7 @@ export default function Console() {
               href="/"
               className="pointer-events-auto font-mono text-[11px] uppercase tracking-[0.12em] text-signal transition-colors hover:text-signal-bright"
             >
-              ← exchange
+              ← overview
             </Link>
           </Panel>
         </div>
@@ -296,13 +296,13 @@ export default function Console() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-faint">stake</span>
-                    <span className="tnum text-dim">{fmtCompact(node.stake, "")} COMP</span>
+                    <span className="tnum text-dim">{fmtCompact(node.stake, "")} Q0R</span>
                   </div>
                   <div className="flex justify-between border-t border-line pt-3">
-                    <span className="text-faint">session light</span>
+                    <span className="text-faint">session rewards</span>
                     <CountUp
                       value={node.earnings}
-                      format={(v) => `${v.toFixed(1)} lm`}
+                      format={(v) => `${v.toFixed(1)} Q0R`}
                       className="text-cyan"
                     />
                   </div>

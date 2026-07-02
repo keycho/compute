@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
+import CountUp from "@/components/ui/CountUp";
 import Scramble from "@/components/ui/Scramble";
-import MarketTerminal from "./MarketTerminal";
+import { useProtocol } from "@/lib/useProtocol";
+import Telemetry from "./Telemetry";
 
 const ease = [0.7, 0, 0.3, 1] as const;
 
@@ -17,48 +19,50 @@ const enter = (delay: number) => ({
 });
 
 export default function Hero() {
+  const snap = useProtocol();
+
   return (
     <section className="relative flex min-h-svh items-center pt-16" id="top">
       {/* readability scrim: keeps the left column legible over the scene */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 w-[68%]"
+        className="pointer-events-none absolute inset-y-0 left-0 w-[72%]"
         style={{
           background:
-            "radial-gradient(ellipse 90% 70% at 18% 50%, rgba(5,5,7,0.82), rgba(5,5,7,0.35) 55%, transparent 78%)",
+            "radial-gradient(ellipse 92% 72% at 16% 50%, rgba(3,3,4,0.92), rgba(3,3,4,0.5) 55%, transparent 80%)",
         }}
       />
       <div className="container-x relative grid w-full items-center gap-14 pb-24 pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
         <div>
           <motion.p {...enter(0.1)} className="chip mb-7">
-            <Scramble text="THE FINANCIAL LAYER FOR COMPUTE" duration={700} />
+            <Scramble text="THE EXECUTION LAYER FOR DECENTRALIZED COMPUTE" duration={700} />
           </motion.p>
 
           <motion.h1
             {...enter(0.22)}
-            className="display text-[clamp(2.5rem,4.6vw,4.6rem)]"
+            className="display text-[clamp(2.9rem,5.6vw,5.6rem)]"
           >
-            Trade the price
+            Every GPU.
             <br />
-            of computation<span className="text-signal">.</span>
+            One network<span className="text-signal">.</span>
           </motion.h1>
 
           <motion.p
             {...enter(0.38)}
             className="mt-8 max-w-[560px] font-mono text-[15px] leading-[1.75] text-dim"
           >
-            Compute Markets is an on-chain exchange where GPU capacity clears as
-            a financial asset. Perpetual futures, tokenized compute credits, and
-            infrastructure indexes settle against live utilization data from the
-            network oracle.
+            q0r routes execution across a global network of independent
+            providers. Applications submit workloads; the protocol discovers
+            capacity, verifies every result, and settles rewards automatically.
+            Compute without infrastructure.
           </motion.p>
 
           <motion.div {...enter(0.52)} className="mt-10 flex flex-wrap items-center gap-4">
             <Button href="/app" size="lg">
-              Launch App <span aria-hidden>→</span>
+              Launch Console <span aria-hidden>→</span>
             </Button>
-            <Button href="#markets" size="lg" variant="ghost">
-              View Markets
+            <Button href="#network" size="lg" variant="ghost">
+              Explore the network
             </Button>
           </motion.div>
 
@@ -67,13 +71,28 @@ export default function Hero() {
             className="mt-14 flex flex-wrap gap-x-10 gap-y-4 font-mono text-[11px] uppercase tracking-[0.13em] text-mute"
           >
             <span>
-              <span className="text-ink tnum">$1.2B+</span> cumulative volume
+              <CountUp
+                value={snap.providers}
+                format={(v) => Math.round(v).toLocaleString("en-US")}
+                className="text-ink"
+              />{" "}
+              active providers
             </span>
             <span>
-              <span className="text-ink tnum">6</span> live markets
+              <CountUp
+                value={snap.jobsExecuted}
+                format={(v) => `${(v / 1e6).toFixed(1)}M`}
+                className="text-ink"
+              />{" "}
+              jobs executed
             </span>
             <span>
-              <span className="text-ink tnum">400ms</span> settlement finality
+              <CountUp
+                value={snap.availablePflops}
+                format={(v) => `${Math.round(v)} PFLOPS`}
+                className="text-ink"
+              />{" "}
+              available
             </span>
           </motion.div>
         </div>
@@ -84,7 +103,7 @@ export default function Hero() {
           transition={{ duration: 1.1, delay: 0.5, ease }}
           className="flex justify-center lg:justify-end"
         >
-          <MarketTerminal />
+          <Telemetry />
         </motion.div>
       </div>
 
@@ -96,8 +115,8 @@ export default function Hero() {
         className="pointer-events-none absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
         aria-hidden
       >
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
-          scroll
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-mute">
+          descend
         </span>
         <span className="block h-8 w-px overflow-hidden bg-line">
           <motion.span

@@ -1,7 +1,7 @@
 /**
  * Deterministic PRNG utilities.
  *
- * Every simulated surface in the app (markets, network topology, depth books)
+ * Every simulated surface in the app (telemetry, network topology, curves)
  * derives from seeded generators so server and client render identical first
  * frames, and reloads feel like reconnecting to the same live system rather
  * than a new random one.

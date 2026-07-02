@@ -20,7 +20,7 @@ export interface ProviderNode {
   capacity: number; // GPUs
   utilization: number; // 0..1
   reliability: number; // 0..1
-  stake: number; // COMP staked
+  stake: number; // Q0R staked
   earnings: number; // accumulated this session
   glow: number; // transient light from job arrivals, decays
   tier: 0 | 1 | 2; // visual weight
@@ -68,7 +68,7 @@ export interface NetworkState {
   activeGpus: number;
 }
 
-export function createNetwork(nodeCount = 56, seed = "compute-markets"): NetworkState {
+export function createNetwork(nodeCount = 56, seed = "q0r-mesh"): NetworkState {
   const rand = mulberry32(hashSeed(seed));
   const nodes: ProviderNode[] = [];
   const golden = Math.PI * (3 - Math.sqrt(5));

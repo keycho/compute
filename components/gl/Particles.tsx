@@ -66,11 +66,11 @@ const fragment = /* glsl */ `
     float d = length(gl_PointCoord - 0.5);
     float a = smoothstep(0.5, 0.1, d) * vFade;
     // cool white base, some particles tinted signal blue or violet
-    vec3 white = vec3(0.5, 0.56, 0.74);
+    vec3 white = vec3(0.42, 0.47, 0.64);
     vec3 blue = vec3(0.3, 0.42, 0.92);
     vec3 violet = vec3(0.44, 0.3, 0.85);
     vec3 col = vTint < 0.72 ? white : (vTint < 0.9 ? blue : violet);
-    gl_FragColor = vec4(col, a * 0.4);
+    gl_FragColor = vec4(col, a * 0.3);
   }
 `;
 

@@ -1,4 +1,4 @@
-# Compute Markets — design system
+# q0r — design system
 
 The financial layer for compute. A protocol interface, not a marketing site:
 every surface reads like an instrument that is already running.
@@ -9,7 +9,7 @@ palette, state-swap hovers, terminal motifs. Fused with an immersive
 Active-Theory-style WebGL journey: pure black, volumetric fog, crystalline
 geometry, particle flows, neural mesh, soft bloom, floating glass panels.
 Where Lambda is flat and warm (cream/ultraviolet, hard RGB-split shadows,
-zero radius, zero glass), Compute Markets is deep and cool (ice/signal
+zero radius, zero glass), q0r is deep and cool (ice/signal
 blue/violet, soft phosphor glow, glass panels with real blur). Same
 discipline, different physics.
 
@@ -50,7 +50,7 @@ body 16; small 14; label 12 caps +0.14em; tick 11.
 
 Motifs: `[ LABEL ]` square-bracket chips (mono 12 caps, --ink-mute, brackets
 in --signal). Index numbers `01 /` — digits --ink-mute, slash --signal.
-Column headings prefixed `::`. Symbols like `H100-PERP` always mono 500.
+Column headings prefixed `::`. Symbols like `H100` / `nd-9417` always mono 500.
 
 ## 3. Space & structure
 
@@ -98,32 +98,33 @@ Bloom (postprocessing) intensity 0.9, luminance threshold 0.2. DPR capped
 
 Production system documentation. Declarative present tense. No vision, no
 "we're building", no hype. Sentences state what the protocol does:
-"Funding accrues hourly against the utilization oracle." Numbers are
+"Placement weighs latency, stake, and live demand." Numbers are
 specific. UI microcopy lowercase-tolerant but default sentence case;
 labels ALL-CAPS mono.
 
 ## 7. Page map
 
 1. Nav — fixed 64px, hairline bottom, glass after 24px scroll. Links:
-   Markets, Perpetuals, Indexes, Analytics, Developers, Docs. Boxed
-   `Launch App` CTA (full-height right block, signal fill on hover).
-2. Hero — 100svh. Left: `[ THE FINANCIAL LAYER FOR COMPUTE ]` eyebrow,
-   display-xl headline, mono subcopy, Launch App + View Markets. Right:
-   floating glass terminal — live market list (six symbols, sparklines,
-   funding), depth strip, pointer-tilt parallax.
-3. Ticker — full-bleed marquee, all symbols, hairline top+bottom.
+   Protocol, Network, Execution, Providers, Developers, Docs. Boxed
+   `Launch Console` CTA (signal fill, glow on hover).
+2. Hero — 100svh. Left: `[ THE EXECUTION LAYER FOR DECENTRALIZED
+   COMPUTE ]` eyebrow, display-xl headline, mono subcopy, Launch Console
+   + Explore the network. Right: floating glass telemetry — provider
+   classes (available GPUs, routing, load sparklines), capacity/load
+   curve, pointer-tilt parallax.
+3. Ticker — full-bleed telemetry marquee (classes + regions).
 4. Numbered strip — three `01 /` declarative system facts.
-5. Markets — section header + 4 glass feature cards (Perpetual Markets,
-   Tokenized Compute, Liquidity, Indexes), checker offset layout.
-6. Analytics — stat rail (TVL, Volume, Funding, OI, Utilization) + most
-   active markets + top gainers + funding heatmap + live depth chart.
-7. Protocol — numbered accordion rows: order flow → clearing →
-   settlement → oracle. System mechanics copy.
-8. Developers — terminal panel (REST / WebSocket / SDK / Subgraph tabs,
+5. Protocol — section header + 4 glass pillar cards (Routing, Verified
+   execution, Provider rewards, Programmable infrastructure).
+6. Network state — stat rail (providers, PFLOPS, throughput, routing,
+   utilization) + provider classes + top regions + utilization surface +
+   capacity/load curve.
+7. Execution pipeline — numbered accordion: submit → route → execute &
+   verify → settle.
+8. Developers — terminal panel (curl / WebSocket / SDK / Subgraph tabs,
    print-in animation) + capability list.
-9. CTA band — inverted glow panel: "Connect to the exchange."
-10. Footer — 4 columns + giant dimmed wordmark + legal. Signature:
-    compression particle line.
+9. CTA band — glow panel: "Plug into the network."
+10. Footer — 4 columns + giant dimmed q0r mark + legal.
 
 `/app` — the network console: full-viewport WebGL mesh (providers as
 luminous nodes, jobs as moving energy packets, earnings as accumulating

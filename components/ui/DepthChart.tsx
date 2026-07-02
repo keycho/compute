@@ -1,56 +1,50 @@
 "use client";
 
 import { useMemo } from "react";
-import type { MarketBook } from "@/lib/market";
+import type { CapacityCurve } from "@/lib/protocol";
 
 /**
- * Mirrored cumulative depth. Bids build left in signal blue, asks build
- * right in rose; the spread sits in the quiet middle.
+ * Capacity/load curve: cumulative available capacity builds left in
+ * signal blue, cumulative allocated load builds right in violet, both
+ * binned by routing latency. The dashed line marks the class's current
+ * median routing point.
  */
 export default function DepthChart({
-  book,
+  curve,
   width = 520,
   height = 140,
   className,
 }: {
-  book: MarketBook;
+  curve: CapacityCurve;
   width?: number;
   height?: number;
   className?: string;
 }) {
-  const { bidPath, askPath, midX } = useMemo(() => {
-    const { bids, asks, mid } = book;
-    if (!bids.length || !asks.length) return { bidPath: "", askPath: "", midX: width / 2 };
-    const lo = bids[bids.length - 1].price;
-    const hi = asks[asks.length - 1].price;
+  const { capPath, loadPath, midX } = useMemo(() => {
+    const { capacity, load, mid } = curve;
+    if (!capacity.length || !load.length) return { capPath: "", loadPath: "", midX: width / 2 };
+    const lo = capacity[capacity.length - 1].x;
+    const hi = load[load.length - 1].x;
     const span = hi - lo || 1;
-    const maxTotal = Math.max(bids[bids.length - 1].total, asks[asks.length - 1].total) || 1;
-    const x = (p: number) => ((p - lo) / span) * width;
+    const maxTotal = Math.max(capacity[capacity.length - 1].total, load[load.length - 1].total) || 1;
+    const x = (v: number) => ((v - lo) / span) * width;
     const y = (t: number) => height - (t / maxTotal) * (height - 8);
 
-    // step outline: bids walk out to the left from mid
-    let bd = `M${x(mid).toFixed(1)},${height}`;
-    let prevY = height;
-    for (const lvl of bids) {
-      const px = x(lvl.price);
-      const py = y(lvl.total);
-      bd += ` L${px.toFixed(1)},${prevY.toFixed(1)} L${px.toFixed(1)},${py.toFixed(1)}`;
-      prevY = py;
-    }
-    bd += ` L${x(lo).toFixed(1)},${prevY.toFixed(1)} L${x(lo).toFixed(1)},${height} Z`;
+    const step = (levels: typeof capacity) => {
+      let d = `M${x(mid).toFixed(1)},${height}`;
+      let prevY = height;
+      for (const lvl of levels) {
+        const px = x(lvl.x);
+        const py = y(lvl.total);
+        d += ` L${px.toFixed(1)},${prevY.toFixed(1)} L${px.toFixed(1)},${py.toFixed(1)}`;
+        prevY = py;
+      }
+      const endX = x(levels[levels.length - 1].x);
+      return `${d} L${endX.toFixed(1)},${prevY.toFixed(1)} L${endX.toFixed(1)},${height} Z`;
+    };
 
-    let ad = `M${x(mid).toFixed(1)},${height}`;
-    prevY = height;
-    for (const lvl of asks) {
-      const px = x(lvl.price);
-      const py = y(lvl.total);
-      ad += ` L${px.toFixed(1)},${prevY.toFixed(1)} L${px.toFixed(1)},${py.toFixed(1)}`;
-      prevY = py;
-    }
-    ad += ` L${x(hi).toFixed(1)},${prevY.toFixed(1)} L${x(hi).toFixed(1)},${height} Z`;
-
-    return { bidPath: bd, askPath: ad, midX: x(mid) };
-  }, [book, width, height]);
+    return { capPath: step(capacity), loadPath: step(load), midX: x(mid) };
+  }, [curve, width, height]);
 
   return (
     <svg
@@ -60,17 +54,17 @@ export default function DepthChart({
       aria-hidden
     >
       <defs>
-        <linearGradient id="depth-bid" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="curve-cap" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#5b7cff" stopOpacity="0.42" />
           <stop offset="100%" stopColor="#5b7cff" stopOpacity="0.05" />
         </linearGradient>
-        <linearGradient id="depth-ask" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fb7185" stopOpacity="0.34" />
-          <stop offset="100%" stopColor="#fb7185" stopOpacity="0.04" />
+        <linearGradient id="curve-load" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.36" />
+          <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.04" />
         </linearGradient>
       </defs>
-      <path d={bidPath} fill="url(#depth-bid)" stroke="#5b7cff" strokeOpacity="0.8" strokeWidth="1" />
-      <path d={askPath} fill="url(#depth-ask)" stroke="#fb7185" strokeOpacity="0.7" strokeWidth="1" />
+      <path d={capPath} fill="url(#curve-cap)" stroke="#5b7cff" strokeOpacity="0.8" strokeWidth="1" />
+      <path d={loadPath} fill="url(#curve-load)" stroke="#8b5cf6" strokeOpacity="0.75" strokeWidth="1" />
       <line
         x1={midX}
         y1="4"
