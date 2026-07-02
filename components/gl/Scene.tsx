@@ -106,19 +106,25 @@ export default function Scene() {
             crystalProgress={crystalProgress}
             meshProgress={meshProgress}
           />
-          <Crystal progressRef={crystalProgress} />
-          <NetworkMesh progressRef={meshProgress} />
-          <Particles uniformsRef={particleUniforms} />
+          {/* shifted right + up so the formation clears the hero copy
+              and action cards on the left */}
+          <group position={[1.9, 0.45, 0]}>
+            <Crystal progressRef={crystalProgress} />
+            <NetworkMesh progressRef={meshProgress} />
+            <Particles uniformsRef={particleUniforms} />
+          </group>
           <EffectComposer>
+            {/* tight bloom: only the HDR core blooms — the haze was
+                washing the pixel grains into smoke */}
             <Bloom
               mipmapBlur
-              intensity={0.62}
-              luminanceThreshold={0.26}
-              luminanceSmoothing={0.32}
-              radius={0.8}
+              intensity={0.3}
+              luminanceThreshold={0.5}
+              luminanceSmoothing={0.25}
+              radius={0.45}
             />
             <Vignette darkness={0.72} offset={0.28} />
-            <Noise opacity={0.02} />
+            <Noise opacity={0.06} />
           </EffectComposer>
         </Suspense>
       </Canvas>
