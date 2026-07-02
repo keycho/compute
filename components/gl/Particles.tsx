@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { mulberry32 } from "@/lib/prng";
 import { viewState } from "@/lib/viewState";
 
-const COUNT = 1500;
+const COUNT = 900;
 
 const vertex = /* glsl */ `
   attribute vec3 aSeed;
@@ -53,8 +53,8 @@ const vertex = /* glsl */ `
     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
     gl_Position = projectionMatrix * mv;
     float twinkle = 0.75 + 0.25 * sin(uTime * (1.0 + aSeed.x * 2.0) + aSeed.y * TAU);
-    // small, clamped points: discrete grains instead of overlapping blobs
-    gl_PointSize = clamp(aSize * twinkle * (90.0 / -mv.z), 1.0, 12.0);
+    // tiny clamped points: sparse pixel stars, never a cloud mass
+    gl_PointSize = clamp(aSize * twinkle * (50.0 / -mv.z), 1.0, 4.0);
     vFade = uDim * twinkle * smoothstep(-24.0, -3.0, mv.z);
   }
 `;
@@ -70,7 +70,7 @@ const fragment = /* glsl */ `
     vec3 bright = vec3(0.92);
     vec3 dark = vec3(0.28);
     vec3 col = vTint < 0.72 ? mid : (vTint < 0.9 ? bright : dark);
-    gl_FragColor = vec4(col, vFade * 0.3);
+    gl_FragColor = vec4(col, vFade * 0.45);
   }
 `;
 
