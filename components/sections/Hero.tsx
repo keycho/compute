@@ -35,34 +35,36 @@ export default function Hero() {
       <div className="container-x relative grid w-full items-center gap-14 pb-24 pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
         <div>
           <motion.p {...enter(0.1)} className="chip mb-7">
-            <Scramble text="THE EXECUTION LAYER FOR DECENTRALIZED COMPUTE" duration={700} />
+            <Scramble text="DECENTRALIZED GPU NETWORK" duration={700} />
           </motion.p>
 
           <motion.h1
             {...enter(0.22)}
-            className="display text-[clamp(2.9rem,5.6vw,5.6rem)]"
+            className="display text-[clamp(2.5rem,4.3vw,4.3rem)]"
           >
-            Every GPU.
+            Compute powered
             <br />
-            One network<span className="text-signal">.</span>
+            by people, not
+            <br />
+            hyperscalers<span className="text-signal">.</span>
           </motion.h1>
 
           <motion.p
             {...enter(0.38)}
             className="mt-8 max-w-[560px] font-mono text-[15px] leading-[1.75] text-dim"
           >
-            q0r routes execution across a global network of independent
-            providers. Applications submit workloads; the protocol discovers
-            capacity, verifies every result, and settles rewards automatically.
-            Compute without infrastructure.
+            Run AI, rendering, and high-performance workloads across a
+            decentralized network of independent GPU providers. Submit a job
+            through one API — the network finds the hardware, verifies the
+            result, and pays the people who ran it.
           </motion.p>
 
           <motion.div {...enter(0.52)} className="mt-10 flex flex-wrap items-center gap-4">
             <Button href="/app" size="lg">
-              Launch Console <span aria-hidden>→</span>
+              Launch App <span aria-hidden>→</span>
             </Button>
-            <Button href="#network" size="lg" variant="ghost">
-              Explore the network
+            <Button href="#developers" size="lg" variant="ghost">
+              Read Docs
             </Button>
           </motion.div>
 

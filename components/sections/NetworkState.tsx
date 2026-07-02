@@ -130,7 +130,7 @@ export default function NetworkState() {
         />
 
         {/* stat rail */}
-        <div className="container-x mt-20 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="container-x mt-20 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Reveal>
             <StatTile
               label="Active providers"
@@ -139,38 +139,63 @@ export default function NetworkState() {
               sub="staked and reachable"
             />
           </Reveal>
-          <Reveal delay={0.06}>
+          <Reveal delay={0.05}>
             <StatTile
-              label="Available compute"
-              value={snap.availablePflops}
+              label="Network capacity"
+              value={snap.capacityPflops}
               format={(v) => `${Math.round(v)} PF`}
-              sub="unallocated capacity"
+              sub="allocated + free"
               accent
             />
           </Reveal>
-          <Reveal delay={0.12}>
+          <Reveal delay={0.1}>
             <StatTile
-              label="Throughput"
+              label="Jobs in queue"
+              value={snap.queueDepth}
+              format={(v) => fmtCompact(v, "")}
+              sub="awaiting placement"
+            />
+          </Reveal>
+          <Reveal delay={0.15}>
+            <StatTile
+              label="Execution rate"
               value={snap.throughputJobsMin}
               format={(v) => `${fmtCompact(v, "")}/min`}
               sub="verified executions"
             />
           </Reveal>
-          <Reveal delay={0.18}>
-            <StatTile
-              label="Median routing"
-              value={snap.medianLatencyMs}
-              format={(v) => `${Math.round(v)}ms`}
-              sub="submit → placement"
-            />
-          </Reveal>
-          <Reveal delay={0.24}>
+          <Reveal delay={0.2}>
             <StatTile
               label="Utilization"
               value={snap.utilization * 100}
               format={(v) => `${v.toFixed(1)}%`}
               sub="mesh-wide GPU load"
               accent
+            />
+          </Reveal>
+          <Reveal delay={0.25}>
+            <StatTile
+              label="Latency"
+              value={snap.medianLatencyMs}
+              format={(v) => `${Math.round(v)}ms`}
+              sub="median · submit → placement"
+            />
+          </Reveal>
+          <Reveal delay={0.3}>
+            <StatTile
+              label="Network health"
+              value={snap.networkHealth}
+              format={(v) => `${v.toFixed(2)}%`}
+              sub="verification × reliability"
+              accent
+            />
+          </Reveal>
+          <Reveal delay={0.35}>
+            <StatTile
+              label="Available GPUs"
+              value={snap.availableGpus}
+              format={(v) => fmtCompact(v, "")}
+              sub="ready for placement"
             />
           </Reveal>
         </div>

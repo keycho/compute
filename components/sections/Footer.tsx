@@ -5,17 +5,17 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
   {
     heading: "Protocol",
     links: [
-      { label: "Routing", href: "#protocol" },
-      { label: "Verification", href: "#execution" },
-      { label: "Rewards", href: "#execution" },
-      { label: "Governance", href: "#execution" },
+      { label: "Why q0r", href: "#why" },
+      { label: "How it works", href: "#how" },
+      { label: "Workloads", href: "#workloads" },
+      { label: "Token", href: "#token" },
     ],
   },
   {
     heading: "Network",
     links: [
-      { label: "Providers", href: "#network" },
-      { label: "Regions", href: "#network" },
+      { label: "Providers", href: "#providers" },
+      { label: "Live state", href: "#network" },
       { label: "Capacity", href: "#network" },
       { label: "Status", href: "#network" },
     ],
