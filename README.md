@@ -43,6 +43,11 @@ Every moving number on the site is driven by one seeded market engine and
 one seeded network simulation, so all surfaces observe the same tape and
 server/client first paints agree.
 
+## Other sites in this repo
+
+- `sites/q0r/` — the q0r site (Vite + Three.js), deployed as its own Vercel
+  project with Root Directory set to `sites/q0r`.
+
 ## Development
 
 ```
