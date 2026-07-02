@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>q0r — the execution layer for distributed compute</title>
+  <meta name="description" content="q0r routes workloads across a global mesh of independent nodes. placement resolves on live latency, stake weight, and available capacity. every execution is verified and finalized at the protocol layer." />
+  <meta name="theme-color" content="#04050a" />
+  <meta property="og:title" content="q0r — the execution layer for distributed compute" />
+  <meta property="og:description" content="distributed compute, routed by the mesh. verified at the protocol layer." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://q0r.network" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body>
+
+  <!-- boot sequence -->
+  <div id="boot" aria-hidden="true">
+    <div class="boot-inner">
+      <div class="boot-mark">q0r</div>
+      <div class="boot-log" id="bootLog"></div>
+      <div class="boot-bar"><i id="bootBar"></i></div>
+      <div class="boot-skip">press any key to skip</div>
+    </div>
+  </div>
+
+  <!-- webgl world -->
+  <canvas id="gl" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- chrome -->
+  <header id="nav">
+    <a class="nav-mark" href="#hero" aria-label="q0r home">
+      <svg class="nav-glyph" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <circle cx="11" cy="11" r="8.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M14.5 14.5 L20 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="11" cy="11" r="2.2" fill="currentColor"/>
+      </svg>
+      <span>q0r</span>
+    </a>
+    <nav class="nav-links" aria-label="sections">
+      <a href="#network">network</a>
+      <a href="#system">system</a>
+      <a href="#console">console</a>
+      <a href="#protocol">protocol</a>
+    </nav>
+    <a class="nav-cta" href="#console">
+      <span class="nav-cta-dot" aria-hidden="true"></span>
+      attach console
+    </a>
+  </header>
+
+  <aside id="rail" aria-hidden="true">
+    <i data-rail="hero"></i>
+    <i data-rail="network"></i>
+    <i data-rail="system"></i>
+    <i data-rail="console"></i>
+    <i data-rail="protocol"></i>
+  </aside>
+
+  <main id="content">
+
+    <!-- ================= hero ================= -->
+    <section class="sec sec-hero" id="hero">
+      <div class="hero-center">
+        <p class="eyebrow reveal"><span class="pulse-dot" aria-hidden="true"></span>q0r network · execution layer online</p>
+        <h1 class="hero-title" aria-label="q0r">
+          <span class="hero-letter" data-l="q">q</span><span class="hero-letter" data-l="0">0</span><span class="hero-letter" data-l="r">r</span>
+        </h1>
+        <p class="hero-sub reveal">the execution layer for distributed compute</p>
+        <p class="hero-body reveal">
+          q0r routes workloads across a global mesh of independent nodes.
+          placement resolves on live latency, stake weight, and available capacity.
+          every execution is verified and finalized at the protocol layer.
+        </p>
+      </div>
+      <div class="hero-status reveal" role="status">
+        <div class="stat"><span class="stat-k">nodes online</span><span class="stat-v" data-counter="nodes">14 208</span></div>
+        <div class="stat"><span class="stat-k">jobs in flight</span><span class="stat-v" data-counter="jobs">3 412</span></div>
+        <div class="stat"><span class="stat-k">p50 placement</span><span class="stat-v"><span data-counter="p50">38</span> ms</span></div>
+        <div class="stat"><span class="stat-k">epoch</span><span class="stat-v" data-counter="epoch">2 841</span></div>
+      </div>
+      <div class="hero-cue" aria-hidden="true">
+        <span>enter the mesh</span>
+        <i class="cue-line"></i>
+      </div>
+    </section>
+
+    <!-- ================= network ================= -->
+    <section class="sec sec-network" id="network">
+      <div class="net-hud" aria-hidden="true">
+        <span class="hud-chip reveal" style="--hx:12%; --hy:24%">fra·9d21 <em>4 ms</em> 0.82 util</span>
+        <span class="hud-chip reveal" style="--hx:74%; --hy:18%">sin·44be <em>11 ms</em> 0.64 util</span>
+        <span class="hud-chip reveal" style="--hx:66%; --hy:66%">iad·c7f0 <em>7 ms</em> 0.91 util</span>
+        <span class="hud-chip reveal" style="--hx:22%; --hy:74%">gru·2e5d <em>19 ms</em> 0.47 util</span>
+      </div>
+      <div class="sec-copy">
+        <p class="eyebrow reveal">01 · topology</p>
+        <h2 class="reveal">a mesh that re-forms around demand</h2>
+        <p class="lead reveal">
+          every node announces capacity, latency profile, and stake weight to the
+          routing layer. hot regions attract flow. saturated nodes shed it.
+          placement is not scheduled - it is an emergent property of the mesh.
+        </p>
+        <div class="signal-cards">
+          <article class="card reveal">
+            <h3>latency</h3>
+            <p>propagation is measured continuously between peers. routing reads the live latency field, not a static region map.</p>
+          </article>
+          <article class="card reveal">
+            <h3>stake</h3>
+            <p>operators bond stake to their nodes. weight scales placement priority and is slashed on failed verification.</p>
+          </article>
+          <article class="card reveal">
+            <h3>capacity</h3>
+            <p>nodes stream available compute envelopes. the mesh routes around saturation before queues can form.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= system ================= -->
+    <section class="sec sec-system" id="system">
+      <div class="sys-sticky">
+        <div class="sys-head">
+          <p class="eyebrow">02 · execution path</p>
+          <h2>one job, end to end</h2>
+        </div>
+        <div class="sys-steps">
+          <article class="sys-step" data-step="0">
+            <span class="sys-num">01</span>
+            <h3>submit</h3>
+            <p>
+              a job enters the network as a signed execution request: image digest,
+              resource envelope, price ceiling, deadline. nothing in the request
+              names a machine - the mesh decides.
+            </p>
+            <code class="sys-sig">execution.submit(request, signature)</code>
+          </article>
+          <article class="sys-step" data-step="1">
+            <span class="sys-num">02</span>
+            <h3>route</h3>
+            <p>
+              the routing layer scores candidate nodes on live latency, stake
+              weight, and free capacity. placement resolves in a single round.
+              p50 is 38 ms from request to assignment.
+            </p>
+            <code class="sys-sig">score = f(latency, stake, capacity)</code>
+          </article>
+          <article class="sys-step" data-step="2">
+            <span class="sys-num">03</span>
+            <h3>execute</h3>
+            <p>
+              the assigned node runs the workload in an attested sandbox. progress
+              and resource draw stream back as signed telemetry, visible to the
+              submitter in real time.
+            </p>
+            <code class="sys-sig">telemetry ← node · signed · 1 hz</code>
+          </article>
+          <article class="sys-step" data-step="3">
+            <span class="sys-num">04</span>
+            <h3>verify</h3>
+            <p>
+              output commitments are checked against redundant execution or proof
+              attestation, then finalized to the protocol log. settlement releases
+              at finality. failed verification slashes stake.
+            </p>
+            <code class="sys-sig">finalize(commitment) → epoch log</code>
+          </article>
+        </div>
+        <div class="sys-progress" aria-hidden="true">
+          <i data-seg="0"></i><i data-seg="1"></i><i data-seg="2"></i><i data-seg="3"></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= console ================= -->
+    <section class="sec sec-console" id="console">
+      <div class="sec-copy sec-copy-center">
+        <p class="eyebrow reveal">03 · console</p>
+        <h2 class="reveal">you are not above the system.<br/>you are in it.</h2>
+        <p class="lead reveal">
+          the console is a live view into the mesh from where your nodes stand.
+          flows, placement, accrual - rendered as the system state they are,
+          not rows in a report.
+        </p>
+      </div>
+
+      <div class="console-frame reveal" id="consoleFrame">
+        <div class="console-glass" id="consoleGlass">
+          <div class="console-top">
+            <div class="c-chip c-chip-id">
+              <span class="c-dot" aria-hidden="true"></span>
+              q0r-node <b>9f2e·fra</b>
+            </div>
+            <div class="c-chip">attested</div>
+            <div class="c-chip">epoch <b data-counter="epoch2">2 841</b></div>
+            <div class="c-top-right c-chip c-chip-ghost">observer · read-only</div>
+          </div>
+
+          <div class="console-body">
+            <div class="console-stage">
+              <canvas id="consoleCanvas"></canvas>
+              <div class="stage-label" aria-hidden="true">inbound flow · live</div>
+            </div>
+            <div class="console-side">
+              <div class="side-block">
+                <span class="side-k">utilization</span>
+                <div class="util-wrap">
+                  <canvas id="utilCanvas" width="120" height="120"></canvas>
+                  <span class="util-v"><b id="utilPct">87.3</b>%</span>
+                </div>
+              </div>
+              <div class="side-block">
+                <span class="side-k">epoch accrual</span>
+                <span class="accrual"><b id="accrualV">412.906</b> q0r</span>
+                <canvas id="waveCanvas" width="220" height="42"></canvas>
+              </div>
+              <div class="side-block side-stream">
+                <span class="side-k">verified executions</span>
+                <div class="stream" id="stream"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="console-note reveal">
+          console access is keyed to node identity. read-only observers can attach
+          to any public mesh view.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= protocol ================= -->
+    <section class="sec sec-protocol" id="protocol">
+      <div class="sec-copy">
+        <p class="eyebrow reveal">04 · protocol surface</p>
+        <h2 class="reveal">a small surface, precisely specified</h2>
+        <p class="lead reveal">q0r exposes five verbs. everything else is protocol behavior.</p>
+      </div>
+
+      <div class="proto-grid">
+        <div class="proto-methods reveal">
+          <div class="method">
+            <code>execution.submit</code>
+            <p>sign and broadcast an execution request. returns a job id at acceptance.</p>
+          </div>
+          <div class="method">
+            <code>execution.status</code>
+            <p>stream placement, telemetry, and verification state for a job.</p>
+          </div>
+          <div class="method">
+            <code>mesh.nodes</code>
+            <p>enumerate announced nodes with live latency, stake, and capacity signals.</p>
+          </div>
+          <div class="method">
+            <code>mesh.topology</code>
+            <p>read the current mesh graph as weighted edges.</p>
+          </div>
+          <div class="method">
+            <code>settlement.epoch</code>
+            <p>query accrual and finalized settlement for any epoch.</p>
+          </div>
+        </div>
+
+        <div class="proto-code">
+          <div class="codeblock reveal">
+            <div class="code-head"><span class="code-dot"></span>terminal</div>
+            <pre><code><span class="tk-p">$</span> q0r submit ./job.wasm <span class="tk-c">\</span>
+    --gpu a100:2 <span class="tk-c">\</span>
+    --max-price 0.42 <span class="tk-c">\</span>
+    --deadline 120s
+
+<span class="tk-d">accepted</span>   job <span class="tk-h">0x81f3…c2a4</span>
+<span class="tk-d">routed</span>     node <span class="tk-h">9d21·fra</span> · 38 ms
+<span class="tk-d">running</span>    attested sandbox · telemetry live
+<span class="tk-g">verified</span>   2/2 commitments match
+<span class="tk-g">settled</span>    0.31 q0r · epoch 2 841</code></pre>
+          </div>
+          <div class="codeblock reveal">
+            <div class="code-head"><span class="code-dot"></span>execution receipt</div>
+            <pre><code>{
+  <span class="tk-k">"job"</span>: <span class="tk-s">"0x81f3…c2a4"</span>,
+  <span class="tk-k">"node"</span>: <span class="tk-s">"9d21·fra"</span>,
+  <span class="tk-k">"placement_ms"</span>: <span class="tk-n">38</span>,
+  <span class="tk-k">"commitment"</span>: <span class="tk-s">"0x4be0…77d1"</span>,
+  <span class="tk-k">"verification"</span>: <span class="tk-s">"redundant:2of2"</span>,
+  <span class="tk-k">"settlement"</span>: { <span class="tk-k">"amount"</span>: <span class="tk-s">"0.31"</span>, <span class="tk-k">"epoch"</span>: <span class="tk-n">2841</span> },
+  <span class="tk-k">"finality"</span>: <span class="tk-s">"epoch+1"</span>
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="prim-grid">
+        <article class="prim reveal"><h4>execution requests</h4><p>signed, machine-agnostic job envelopes.</p></article>
+        <article class="prim reveal"><h4>stake-weighted routing</h4><p>placement priority backed by bonded stake.</p></article>
+        <article class="prim reveal"><h4>attested sandboxes</h4><p>hardware-attested isolation on every node.</p></article>
+        <article class="prim reveal"><h4>verification proofs</h4><p>redundant execution or proof attestation.</p></article>
+        <article class="prim reveal"><h4>epoch settlement</h4><p>accrual finalized to the protocol log.</p></article>
+      </div>
+    </section>
+
+    <!-- ================= footer ================= -->
+    <footer class="sec sec-end" id="end">
+      <div class="end-mark" aria-hidden="true">q0r</div>
+      <div class="end-grid">
+        <div class="end-col">
+          <span class="end-k">protocol</span>
+          <a href="#protocol">specification</a>
+          <a href="#protocol">whitepaper</a>
+          <a href="#protocol">changelog</a>
+        </div>
+        <div class="end-col">
+          <span class="end-k">operate</span>
+          <a href="#network">run a node</a>
+          <a href="#network">staking</a>
+          <a href="#system">slashing policy</a>
+        </div>
+        <div class="end-col">
+          <span class="end-k">observe</span>
+          <a href="#console">status</a>
+          <a href="#console">explorer</a>
+          <a href="#console">telemetry</a>
+        </div>
+      </div>
+      <div class="end-line">
+        <span><span class="pulse-dot" aria-hidden="true"></span>execution layer online&nbsp;·&nbsp;epoch&nbsp;<span data-counter="epoch3">2 841</span></span>
+        <span>© 2026 q0r foundation</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
