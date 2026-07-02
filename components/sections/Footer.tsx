@@ -12,7 +12,7 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
     ],
   },
   {
-    heading: "Protocol",
+    heading: "Learn",
     links: [
       { label: "Why q0r", href: "/#why" },
       { label: "How it works", href: "/#how" },

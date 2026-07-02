@@ -26,7 +26,7 @@ export function Wordmark({ className }: { className?: string }) {
     <span className={`flex items-center gap-3 ${className ?? ""}`}>
       <Logo />
       <span className="font-display text-[18px] font-semibold tracking-[-0.01em] text-ink">
-        q0r<span className="font-mono text-[11px] font-normal uppercase tracking-[0.16em] text-mute">&nbsp;&nbsp;protocol</span>
+        q0r
       </span>
     </span>
   );
