@@ -121,7 +121,7 @@ export default function Token() {
                 <p className="font-mono text-[14px] leading-[1.8] text-dim">
                   staking does not unlock features. it changes routing weight.
                 </p>
-                <p className="mt-3 font-mono text-[14px] leading-[1.8] text-ink">
+                <p className="mt-3 font-mono text-[14px] font-semibold leading-[1.8] text-ink">
                   higher stake → higher trust score → more job allocation.
                 </p>
                 <p className="mt-3 font-mono text-[13px] leading-[1.8] text-mute">
@@ -147,7 +147,7 @@ export default function Token() {
                 </ul>
                 <p className="mt-4 font-mono text-[13px] leading-[1.8] text-dim">
                   burn is not scheduled.{" "}
-                  <span className="text-ink">it happens when compute happens.</span>
+                  <span className="font-semibold text-ink">it happens when compute happens.</span>
                 </p>
               </div>
 
@@ -170,7 +170,7 @@ export default function Token() {
               Q0R is not a utility token. it is a coordination signal for
               compute execution.
             </p>
-            <p className="mt-3 font-mono text-[14px] leading-[1.9] text-ink">
+            <p className="mt-3 font-mono text-[14px] font-semibold leading-[1.9] text-ink">
               the network runs regardless. the token enforces trust between
               machines that do not know each other.
             </p>

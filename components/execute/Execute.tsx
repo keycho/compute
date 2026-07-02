@@ -142,7 +142,7 @@ export default function Execute() {
                   <div className="mt-4 border-t border-line pt-3">
                     <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-1 font-mono text-[10.5px] uppercase tracking-[0.1em] text-mute">
                       <span>
-                        executed by <span className="text-signal">{t.meta.node}</span>
+                        executed by <span className="font-semibold text-signal">{t.meta.node}</span>
                       </span>
                       <span>{t.meta.gpu}</span>
                       <span className="text-pos">verified</span>
@@ -182,7 +182,7 @@ export default function Execute() {
           }}
           placeholder="Ask anything..."
           rows={3}
-          className="w-full resize-none bg-transparent px-5 pt-4 font-mono text-[14.5px] leading-[1.7] text-ink placeholder:text-mute focus:outline-none"
+          className="w-full resize-none bg-transparent px-5 pt-4 font-mono text-[14.5px] leading-[1.7] text-ink placeholder:text-[rgba(255,255,255,0.5)] focus:outline-none"
         />
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3">
           <div className="flex flex-wrap items-center gap-4">

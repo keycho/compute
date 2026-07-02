@@ -54,7 +54,10 @@ function WorkerSetup() {
       </div>
       <div className="flex items-center justify-between border-t border-line px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mute">
         <span>paid per verified output · settled in USDC</span>
-        <Link href="/supply" className="text-signal transition-colors hover:text-signal-bright">
+        <Link
+          href="/supply"
+          className="font-semibold text-signal underline decoration-[rgba(255,255,255,0.45)] underline-offset-4 transition-colors hover:decoration-white"
+        >
           the full path →
         </Link>
       </div>

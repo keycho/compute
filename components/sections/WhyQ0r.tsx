@@ -25,7 +25,7 @@ export default function WhyQ0r() {
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="font-mono text-[15px] leading-[1.8] text-ink">
+            <p className="font-mono text-[15px] font-semibold leading-[1.8] text-ink">
               Jobs are not sent to cloud providers. They are routed to available
               GPUs across a global mesh of independent machines.
             </p>
@@ -45,7 +45,7 @@ export default function WhyQ0r() {
               centralized providers — priced by a rate card, gated by quotas,
               parked behind sales calls.
             </p>
-            <p className="mt-4 font-mono text-[14px] leading-[1.8] text-ink">
+            <p className="mt-4 font-mono text-[14px] font-semibold leading-[1.8] text-ink">
               q0r exposes the underlying machines directly.
             </p>
           </Reveal>

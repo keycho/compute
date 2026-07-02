@@ -108,7 +108,7 @@ function JobBlock({ j, onPickNode }: { j: JobEntity; onPickNode: (node: string) 
           v={
             <button
               onClick={() => onPickNode(j.node)}
-              className="text-signal hover:text-signal-bright"
+              className="font-semibold text-signal underline decoration-[rgba(255,255,255,0.45)] underline-offset-2 hover:decoration-white"
             >
               {j.node}
             </button>
@@ -435,7 +435,7 @@ export default function Explorer() {
           </span>
           <Link
             href="/"
-            className="font-mono text-[11px] uppercase tracking-[0.12em] text-signal transition-colors hover:text-signal-bright"
+            className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-signal underline decoration-[rgba(255,255,255,0.45)] underline-offset-4 transition-colors hover:decoration-white"
           >
             ← overview
           </Link>
