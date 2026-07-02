@@ -44,7 +44,10 @@ export default function ActionShell({
         {children}
         <div className="mx-auto mt-14 flex w-full max-w-[780px] items-center justify-between border-t border-line pt-5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
           <span>powered by the q0r mesh · verified execution</span>
-          <Link href="/explore" className="text-signal transition-colors hover:text-signal-bright">
+          <Link
+            href="/explore"
+            className="font-semibold text-signal underline decoration-[rgba(255,255,255,0.45)] underline-offset-4 transition-colors hover:decoration-white"
+          >
             every job lands in the explorer →
           </Link>
         </div>

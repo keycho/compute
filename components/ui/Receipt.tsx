@@ -78,7 +78,7 @@ export default function Receipt({
               <div className="border-t border-line px-4 py-2.5">
                 <Link
                   href={`/explore?block=${receipt.hash}`}
-                  className="font-mono text-[11px] uppercase tracking-[0.12em] text-signal transition-colors duration-150 hover:text-signal-bright"
+                  className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-signal underline decoration-[rgba(255,255,255,0.45)] underline-offset-4 transition-colors duration-150 hover:decoration-white"
                 >
                   view block →
                 </Link>

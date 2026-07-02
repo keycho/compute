@@ -171,7 +171,7 @@ export default function Create() {
           }}
           placeholder="Prompt... a signal blooming through a dark lattice"
           rows={2}
-          className="w-full resize-none bg-transparent px-5 pt-4 font-mono text-[14.5px] leading-[1.7] text-ink placeholder:text-mute focus:outline-none"
+          className="w-full resize-none bg-transparent px-5 pt-4 font-mono text-[14.5px] leading-[1.7] text-ink placeholder:text-[rgba(255,255,255,0.5)] focus:outline-none"
         />
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3">
           <div className="flex flex-wrap items-center gap-4">

@@ -60,7 +60,7 @@ export default function Hero() {
             {...enter(0.38)}
             className="mt-6 max-w-[520px] font-mono text-[14.5px] leading-[1.7]"
           >
-            <span className="text-ink">AI. Images. Video. Code. Custom containers.</span>{" "}
+            <span className="font-semibold text-ink">AI. Images. Video. Code. Custom containers.</span>{" "}
             <span className="text-dim">
               One mesh of people&apos;s GPUs runs it all — and pays the people who own them.
             </span>
@@ -102,11 +102,17 @@ export default function Hero() {
             Underneath: a decentralized mesh of independent GPUs. Jobs route to
             available hardware, execute in verified environments, and every
             result comes back with a receipt you can open in the{" "}
-            <Link href="/explore" className="text-signal hover:text-signal-bright">
+            <Link
+              href="/explore"
+              className="font-semibold underline decoration-[rgba(255,255,255,0.45)] underline-offset-4 hover:decoration-white"
+            >
               explorer
             </Link>
             .{" "}
-            <Link href="#why" className="text-signal hover:text-signal-bright">
+            <Link
+              href="#why"
+              className="font-semibold underline decoration-[rgba(255,255,255,0.45)] underline-offset-4 hover:decoration-white"
+            >
               how it works ↓
             </Link>
           </motion.p>

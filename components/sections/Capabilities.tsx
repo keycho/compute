@@ -82,7 +82,7 @@ export default function Capabilities() {
               {col.cta && (
                 <Link
                   href={col.cta.href}
-                  className="mt-5 inline-flex items-center gap-2 font-mono text-[11.5px] uppercase tracking-[0.12em] text-signal transition-colors duration-150 hover:text-signal-bright"
+                  className="mt-5 inline-flex items-center gap-2 font-mono text-[11.5px] font-semibold uppercase tracking-[0.12em] text-signal underline decoration-[rgba(255,255,255,0.45)] underline-offset-4 transition-colors duration-150 hover:decoration-white"
                 >
                   {col.cta.label} <span aria-hidden>→</span>
                 </Link>

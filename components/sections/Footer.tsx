@@ -71,7 +71,7 @@ export default function Footer() {
                 <li key={l.label}>
                   <Link
                     href={l.href}
-                    className="font-mono text-[13px] text-dim transition-colors duration-150 hover:text-signal-bright"
+                    className="font-mono text-[13px] text-dim underline-offset-4 transition-all duration-150 hover:underline hover:decoration-[rgba(255,255,255,0.6)]"
                   >
                     {l.label}
                   </Link>
