@@ -53,7 +53,8 @@ const vertex = /* glsl */ `
     vec4 mv = modelViewMatrix * vec4(pos, 1.0);
     gl_Position = projectionMatrix * mv;
     float twinkle = 0.75 + 0.25 * sin(uTime * (1.0 + aSeed.x * 2.0) + aSeed.y * TAU);
-    gl_PointSize = aSize * twinkle * (140.0 / -mv.z);
+    // small, clamped points: discrete grains instead of overlapping blobs
+    gl_PointSize = clamp(aSize * twinkle * (90.0 / -mv.z), 1.0, 12.0);
     vFade = uDim * twinkle * smoothstep(-24.0, -3.0, mv.z);
   }
 `;
@@ -63,14 +64,13 @@ const fragment = /* glsl */ `
   varying float vFade;
 
   void main() {
-    float d = length(gl_PointCoord - 0.5);
-    float a = smoothstep(0.5, 0.1, d) * vFade;
-    // monochrome dust: three brightness bands instead of hues
+    // hard-edged square grains — crisp pixel dust, no soft halo.
+    // the blur was the falloff; the grain is the point itself.
     vec3 mid = vec3(0.5);
     vec3 bright = vec3(0.92);
     vec3 dark = vec3(0.28);
     vec3 col = vTint < 0.72 ? mid : (vTint < 0.9 ? bright : dark);
-    gl_FragColor = vec4(col, a * 0.2);
+    gl_FragColor = vec4(col, vFade * 0.3);
   }
 `;
 
