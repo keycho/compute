@@ -14,9 +14,9 @@ export default function Logo({ size = 26, className }: { size?: number; classNam
     >
       <path
         d="M16 2 L28 9 L28 12 L16 5 L4 12 L4 20 L16 27 L28 20 L28 23 L16 30 L1 21.5 L1 10.5 Z"
-        fill="#EDF0F7"
+        fill="#F0F0F0"
       />
-      <path d="M16 11 L22 14.5 L22 17.5 L16 21 L10 17.5 L10 14.5 Z" fill="#5B7CFF" />
+      <path d="M16 11 L22 14.5 L22 17.5 L16 21 L10 17.5 L10 14.5 Z" fill="#8C8C8C" />
     </svg>
   );
 }

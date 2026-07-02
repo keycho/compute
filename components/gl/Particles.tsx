@@ -65,12 +65,12 @@ const fragment = /* glsl */ `
   void main() {
     float d = length(gl_PointCoord - 0.5);
     float a = smoothstep(0.5, 0.1, d) * vFade;
-    // cool white base, some particles tinted signal blue or violet
-    vec3 white = vec3(0.42, 0.47, 0.64);
-    vec3 blue = vec3(0.3, 0.42, 0.92);
-    vec3 violet = vec3(0.44, 0.3, 0.85);
-    vec3 col = vTint < 0.72 ? white : (vTint < 0.9 ? blue : violet);
-    gl_FragColor = vec4(col, a * 0.3);
+    // monochrome dust: three brightness bands instead of hues
+    vec3 mid = vec3(0.5);
+    vec3 bright = vec3(0.92);
+    vec3 dark = vec3(0.28);
+    vec3 col = vTint < 0.72 ? mid : (vTint < 0.9 ? bright : dark);
+    gl_FragColor = vec4(col, a * 0.2);
   }
 `;
 

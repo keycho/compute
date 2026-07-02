@@ -195,7 +195,7 @@ export default function Execute() {
                   onClick={() => setModel(m.key)}
                   className={`rounded-[2px] border px-3 py-1.5 font-mono text-[11px] transition-colors duration-150 ${
                     model === m.key
-                      ? "border-[rgba(91,124,255,0.5)] bg-[rgba(91,124,255,0.1)] text-signal-bright"
+                      ? "border-[rgba(255,255,255,0.5)] bg-[rgba(255,255,255,0.1)] text-signal-bright"
                       : "border-line text-mute hover:text-dim"
                   }`}
                 >
@@ -210,7 +210,7 @@ export default function Execute() {
           <button
             onClick={() => run()}
             disabled={busy || !prompt.trim()}
-            className="rounded-[2px] bg-signal px-7 py-2.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] enabled:hover:bg-signal-bright enabled:hover:shadow-[0_0_24px_rgba(91,124,255,0.4)] disabled:opacity-40"
+            className="rounded-[2px] bg-signal px-7 py-2.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050505] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] enabled:hover:bg-signal-bright enabled:hover:shadow-[0_0_24px_rgba(255,255,255,0.4)] disabled:opacity-40"
           >
             {busy ? "Executing…" : "Execute"}
           </button>
@@ -224,7 +224,7 @@ export default function Execute() {
             <button
               key={s}
               onClick={() => run(s)}
-              className="rounded-[6px] border border-line px-3.5 py-2 font-mono text-[11.5px] text-mute transition-colors duration-150 hover:border-[rgba(91,124,255,0.4)] hover:text-dim"
+              className="rounded-[6px] border border-line px-3.5 py-2 font-mono text-[11.5px] text-mute transition-colors duration-150 hover:border-[rgba(255,255,255,0.4)] hover:text-dim"
             >
               {s}
             </button>

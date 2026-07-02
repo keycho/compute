@@ -28,7 +28,7 @@ export default function Nav() {
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] ${
         scrolled
-          ? "border-line bg-[rgba(3,3,4,0.78)] backdrop-blur-xl"
+          ? "border-line bg-[rgba(6,6,6,0.78)] backdrop-blur-xl"
           : "border-transparent bg-transparent"
       }`}
     >
@@ -53,7 +53,7 @@ export default function Nav() {
           <div className="mx-2 my-4 w-px bg-line" aria-hidden />
           <Link
             href="/explore"
-            className="my-3 inline-flex items-center gap-2 self-center rounded-[2px] bg-signal px-6 py-[10px] font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] hover:bg-signal-bright hover:shadow-[0_0_28px_rgba(91,124,255,0.4)]"
+            className="my-3 inline-flex items-center gap-2 self-center rounded-[2px] bg-signal px-6 py-[10px] font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050505] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] hover:bg-signal-bright hover:shadow-[0_0_28px_rgba(255,255,255,0.4)]"
           >
             Explorer
             <span aria-hidden>→</span>
@@ -88,7 +88,7 @@ export default function Nav() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.45, ease: [0.7, 0, 0.3, 1] }}
-            className="overflow-hidden border-t border-line bg-[rgba(3,3,4,0.94)] backdrop-blur-xl lg:hidden"
+            className="overflow-hidden border-t border-line bg-[rgba(6,6,6,0.94)] backdrop-blur-xl lg:hidden"
             aria-label="Mobile"
           >
             <div className="container-x flex flex-col py-4">
@@ -104,7 +104,7 @@ export default function Nav() {
               ))}
               <Link
                 href="/explore"
-                className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-signal px-6 py-3.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050507]"
+                className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-signal px-6 py-3.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050505]"
               >
                 Explorer <span aria-hidden>→</span>
               </Link>

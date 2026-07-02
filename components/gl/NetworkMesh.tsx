@@ -35,10 +35,11 @@ const packetFragment = /* glsl */ `
   }
 `;
 
+// monochrome: job kinds separate by brightness, not hue
 const KIND_COLORS: Record<string, [number, number, number]> = {
-  inference: [0.36, 0.49, 1.0],
-  training: [0.55, 0.36, 0.97],
-  settlement: [0.4, 0.91, 0.98],
+  inference: [1.0, 1.0, 1.0],
+  training: [0.55, 0.55, 0.55],
+  settlement: [0.8, 0.8, 0.8],
 };
 
 const MAX_PACKETS = 96;
@@ -82,7 +83,7 @@ export default function NetworkMesh({
       const edgeGeometry = new THREE.BufferGeometry();
       edgeGeometry.setAttribute("position", new THREE.BufferAttribute(edgePositions, 3));
       const edgeMaterial = new THREE.LineBasicMaterial({
-        color: new THREE.Color(0.16, 0.2, 0.38),
+        color: new THREE.Color(0.26, 0.26, 0.26),
         transparent: true,
         opacity: 0.5,
         blending: THREE.AdditiveBlending,
@@ -106,9 +107,9 @@ export default function NetworkMesh({
       const baseColors = state.nodes.map((n) => {
         const t = n.tier;
         return new THREE.Color(
-          0.14 + t * 0.1,
-          0.18 + t * 0.13,
-          0.34 + t * 0.24,
+          0.2 + t * 0.16,
+          0.2 + t * 0.16,
+          0.2 + t * 0.16,
         );
       });
       return { nodeGeometry, nodeMaterial, edgeGeometry, edgeMaterial, packetGeometry, packetMaterial, dummy, baseColors };
@@ -146,8 +147,8 @@ export default function NetworkMesh({
         tmpColor.copy(baseColors[i]);
         const brightness = (1 + n.glow * 2.6) * opacity;
         tmpColor.multiplyScalar(brightness);
-        if (n.glow > 0.4) tmpColor.lerp(new THREE.Color(1.4, 1.6, 2.4), Math.min(n.glow - 0.4, 1) * 0.6);
-        if (i === selected) tmpColor.set(1.8, 2.2, 3.6);
+        if (n.glow > 0.4) tmpColor.lerp(new THREE.Color(1.9, 1.9, 1.9), Math.min(n.glow - 0.4, 1) * 0.6);
+        if (i === selected) tmpColor.set(2.6, 2.6, 2.6);
         mesh.setColorAt(i, tmpColor);
       }
       mesh.instanceMatrix.needsUpdate = true;

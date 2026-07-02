@@ -25,7 +25,7 @@ export default function ActionShell({
         className="pointer-events-none fixed inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(ellipse 70% 45% at 50% -6%, rgba(91,124,255,0.1), transparent 62%), radial-gradient(ellipse 55% 42% at 82% 108%, rgba(139,92,246,0.07), transparent 65%), #030304",
+            "radial-gradient(ellipse 70% 45% at 50% -6%, rgba(255,255,255,0.1), transparent 62%), radial-gradient(ellipse 55% 42% at 82% 108%, rgba(255,255,255,0.07), transparent 65%), #060606",
         }}
       />
       <Nav />
