@@ -50,3 +50,9 @@ export function fmtTilde(v: number): string {
 export function fmtRangeMs(lo: number, hi: number): string {
   return `${Math.round(lo)}–${Math.round(hi)}ms`;
 }
+
+/** drifting band: "~38k–41k" */
+export function fmtTildeRange(lo: number, hi: number): string {
+  const k = (v: number) => (Math.abs(v) >= 1e3 ? `${Math.round(v / 1e3)}k` : `${Math.round(v)}`);
+  return `~${k(lo)}\u2013${k(hi)}`;
+}

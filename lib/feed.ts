@@ -90,7 +90,7 @@ export interface WorkerItem {
   node: string;
   region: string;
   gpu: string;
-  status: "online" | "unstable" | "recovered";
+  status: "online" | "unstable" | "throttling" | "recovering";
   loadLo: number;
   loadHi: number;
   loadNow: number;
@@ -122,7 +122,12 @@ export interface FeedSnapshot {
   epoch: number;
   approx: {
     providersMasked: string;
+    providersNote: string;
     jobsInFlight: number;
+    jobsInFlightLo: number;
+    jobsInFlightHi: number;
+    executionDensity: "moderate" | "high" | "elevated";
+    queuePressure: "falling" | "steady" | "rising";
     latencyLo: number;
     latencyHi: number;
     /** millions of Q0R staked, drifting */
@@ -134,6 +139,7 @@ export interface FeedSnapshot {
     pendingSettlement: number;
     slashesEpoch: number;
     lastBurn?: TokenItem;
+    lastBuyback?: TokenItem;
   };
 }
 
@@ -163,6 +169,8 @@ class FeedEngine {
   private pendingSettlement = 41_200;
   private slashesEpoch = 2;
   private lastBurn?: TokenItem;
+  private lastBuyback?: TokenItem;
+  private prevInFlight = 38_000;
 
   constructor() {
     // seed workers
@@ -230,9 +238,17 @@ class FeedEngine {
   private emitWorkerEvent() {
     const r = this.rand;
     const w = this.workers[Math.floor(r() * this.workers.length)];
-    const unstable = r() < 0.55;
-    w.status = unstable ? "unstable" : "recovered";
-    w.note = unstable ? WORKER_NOTES[Math.floor(r() * WORKER_NOTES.length)] : undefined;
+    const roll = r();
+    if (w.status === "unstable" || w.status === "throttling") {
+      w.status = roll < 0.6 ? "recovering" : "online";
+      w.note = undefined;
+    } else {
+      w.status = roll < 0.5 ? "unstable" : "throttling";
+      w.note =
+        w.status === "throttling"
+          ? "thermal throttling"
+          : WORKER_NOTES[Math.floor(r() * WORKER_NOTES.length)];
+    }
     w.updatedTick = this.tick;
     const evt: WorkerItem = { ...w, id: `we-${this.seq++}`, block: this.block++, recent: [...w.recent] };
     this.items.unshift(evt);
@@ -254,7 +270,8 @@ class FeedEngine {
     this.items.unshift(burn);
     this.burnedTotal += burn.amount;
     this.burnedEpoch += burn.amount;
-    this.lastBurn = burn;
+    if (burn.type === "buyback") this.lastBuyback = burn;
+    else this.lastBurn = burn;
   }
 
   private emitSlash() {
@@ -304,6 +321,7 @@ class FeedEngine {
       if (j.progress >= 100) {
         const [rl, rh] = REWARD_BANDS[j.type];
         j.reward = rl + r() * (rh - rl);
+        j.trace = j.trace.map((t) => (t === "executing" ? "executed" : t));
         j.trace.push("verified");
         if (r() < 0.25) {
           j.status = "pending finalization";
@@ -389,6 +407,11 @@ class FeedEngine {
     const lats = running.map((j) => j.latencyNow);
     const lo = lats.length ? Math.min(...lats) : 70;
     const hi = lats.length ? Math.max(...lats) : 110;
+    const inFlight = 36_000 + Math.round(Math.sin(this.tick / 18) * 2_800) + running.length * 40;
+    const drift = inFlight - this.prevInFlight;
+    this.prevInFlight = inFlight;
+    const density = running.length >= 9 ? "elevated" : running.length >= 7 ? "high" : "moderate";
+    const pressure = drift > 40 ? "rising" : drift < -40 ? "falling" : "steady";
     return {
       items: this.items,
       workers: this.workers.map((w) => ({ ...w })),
@@ -396,7 +419,12 @@ class FeedEngine {
       epoch: EPOCH,
       approx: {
         providersMasked: "14,0xx",
-        jobsInFlight: 36_000 + Math.round(Math.sin(this.tick / 18) * 2_800) + running.length * 40,
+        providersNote: this.tick % 23 < 9 ? "sync lagging" : "partial visibility",
+        jobsInFlight: inFlight,
+        jobsInFlightLo: inFlight - 1_400 - (inFlight % 500),
+        jobsInFlightHi: inFlight + 1_600 + (inFlight % 300),
+        executionDensity: density,
+        queuePressure: pressure,
         latencyLo: Math.min(lo, 78),
         latencyHi: Math.max(hi, 104),
         stakedM: this.stakedM,
@@ -407,6 +435,7 @@ class FeedEngine {
         pendingSettlement: this.pendingSettlement,
         slashesEpoch: this.slashesEpoch,
         lastBurn: this.lastBurn,
+        lastBuyback: this.lastBuyback,
       },
     };
   }

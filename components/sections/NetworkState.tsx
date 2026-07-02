@@ -1,7 +1,7 @@
 "use client";
 
 import { useFeed } from "@/lib/useFeed";
-import { fmtRangeMs, fmtTilde } from "@/lib/format";
+import { fmtRangeMs, fmtTildeRange } from "@/lib/format";
 import Reveal from "@/components/ui/Reveal";
 import SectionHeader from "@/components/ui/SectionHeader";
 
@@ -61,15 +61,23 @@ export default function NetworkState() {
                   approx · streaming
                 </span>
               </div>
-              <StateRow label="active providers" value={snap.approx.providersMasked} />
-              <StateRow label="jobs in flight" value={fmtTilde(snap.approx.jobsInFlight)} />
               <StateRow
-                label="median latency"
+                label="active providers"
+                value={snap.approx.providersMasked}
+                note={snap.approx.providersNote}
+              />
+              <StateRow
+                label="jobs in flight"
+                value={fmtTildeRange(snap.approx.jobsInFlightLo, snap.approx.jobsInFlightHi)}
+              />
+              <StateRow
+                label="latency"
                 value={fmtRangeMs(snap.approx.latencyLo, snap.approx.latencyHi)}
                 note="varies"
               />
+              <StateRow label="execution density" value={snap.approx.executionDensity} />
+              <StateRow label="queue pressure" value={snap.approx.queuePressure} />
               <StateRow label="failover events" value="occasional" note="rerouted in-flight" />
-              <StateRow label="verification" value="on completion" />
               <StateRow label="settlement" value="epoch-based" note={`epoch ${snap.epoch.toLocaleString()}`} />
               <p className="mt-5 font-mono text-[11.5px] leading-[1.7] text-mute">
                 Global inventory is not tracked centrally. Any number above is
@@ -96,10 +104,14 @@ export default function NetworkState() {
                     </span>
                     <span
                       className={`font-mono text-[10.5px] uppercase tracking-[0.1em] ${
-                        w.status === "unstable" ? "text-neg" : "text-pos"
+                        w.status === "unstable"
+                          ? "text-neg"
+                          : w.status === "throttling"
+                            ? "text-violet"
+                            : "text-pos"
                       }`}
                     >
-                      {w.status === "recovered" ? "online" : w.status}
+                      {w.status}
                     </span>
                   </div>
                   <p className="mt-0.5 font-mono text-[11px] text-mute">
@@ -115,7 +127,7 @@ export default function NetworkState() {
                   <div className="mt-1.5 h-[4px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.06)]">
                     <div
                       className={`h-full rounded-full transition-[width] duration-1000 ${
-                        w.status === "unstable" ? "bg-neg/70" : "bg-signal/70"
+                        w.status === "unstable" || w.status === "throttling" ? "bg-neg/70" : "bg-signal/70"
                       }`}
                       style={{ width: `${w.loadNow}%` }}
                     />
