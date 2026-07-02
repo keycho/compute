@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
+import { EffectComposer, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { AnimatePresence, motion } from "framer-motion";
+import Dither from "@/components/gl/Dither";
 import NetworkMesh from "@/components/gl/NetworkMesh";
 import { Wordmark } from "@/components/ui/Logo";
 import {
@@ -406,14 +407,11 @@ export default function Explorer() {
           accent
         />
         <EffectComposer>
-          <Bloom
-            mipmapBlur
-            intensity={1.05}
-            luminanceThreshold={0.16}
-            luminanceSmoothing={0.3}
-            radius={0.85}
-          />
+          {/* no bloom — same rule as the landing scene: vignette shapes
+              the light, dither quantizes every gradient into pattern.
+              the dither preserves hue, so the green accent survives. */}
           <Vignette darkness={0.78} offset={0.24} />
+          <Dither levels={5} />
         </EffectComposer>
       </Canvas>
 

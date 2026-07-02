@@ -44,11 +44,13 @@ const KIND_COLORS: Record<string, [number, number, number]> = {
 };
 
 // accent mode (explorer): phosphor green on the moving/live parts —
-// packets and glow — while structure stays monochrome
+// packets and glow — while structure stays monochrome. values stay in
+// gamut after the shader's ×1.7 (no bloom → channels clamp, and
+// clamping unequal channels would shift the hue toward cyan)
 const KIND_COLORS_ACCENT: Record<string, [number, number, number]> = {
-  inference: [0.35, 1.0, 0.58],
-  training: [0.2, 0.58, 0.34],
-  settlement: [0.5, 1.15, 0.68],
+  inference: [0.27, 0.58, 0.36],
+  training: [0.16, 0.35, 0.22],
+  settlement: [0.29, 0.6, 0.38],
 };
 
 const MAX_PACKETS = 96;
@@ -129,11 +131,11 @@ export default function NetworkMesh({
 
   const tmpColor = useMemo(() => new THREE.Color(), []);
   const glowColor = useMemo(
-    () => (accent ? new THREE.Color(0.55, 2.4, 1.1) : new THREE.Color(1.9, 1.9, 1.9)),
+    () => (accent ? new THREE.Color(0.3, 0.95, 0.5) : new THREE.Color(1.9, 1.9, 1.9)),
     [accent],
   );
   const selColor = useMemo(
-    () => (accent ? new THREE.Color(0.7, 3.0, 1.4) : new THREE.Color(2.6, 2.6, 2.6)),
+    () => (accent ? new THREE.Color(0.42, 1.0, 0.6) : new THREE.Color(2.6, 2.6, 2.6)),
     [accent],
   );
   const kindColors = accent ? KIND_COLORS_ACCENT : KIND_COLORS;
