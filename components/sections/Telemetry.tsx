@@ -1,21 +1,19 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useReducedMotion, useSpring } from "framer-motion";
-import { useProtocol } from "@/lib/useProtocol";
-import { getProtocol } from "@/lib/protocol";
-import { fmtCompact, fmtLatency } from "@/lib/format";
-import Sparkline from "@/components/ui/Sparkline";
-import DepthChart from "@/components/ui/DepthChart";
+import Link from "next/link";
+import { useRef } from "react";
+import { AnimatePresence, motion, useReducedMotion, useSpring } from "framer-motion";
+import { useFeed } from "@/lib/useFeed";
+import { fmtRangeMs, fmtTilde } from "@/lib/format";
+import { itemDetail, itemStatusLabel, itemTitle } from "@/components/ui/feedFormat";
 
 /**
- * The hero instrument: a floating glass panel streaming live network
- * telemetry per provider class, with the capacity/load curve for
- * whichever class is armed. Pointer tilt gives it physical presence.
+ * The hero instrument: the live job stream, straight from the mesh.
+ * Rows arrive on top, update in place, reroute, fail, settle. Clicking
+ * through lands in the console where every row can be inspected.
  */
 export default function Telemetry() {
-  const snap = useProtocol();
-  const [selected, setSelected] = useState("H100");
+  const snap = useFeed();
   const reduced = useReducedMotion();
 
   const rx = useSpring(0, { stiffness: 60, damping: 14 });
@@ -33,8 +31,7 @@ export default function Telemetry() {
     ry.set(0);
   };
 
-  const curve = getProtocol().curve(selected, 16);
-  const sel = snap.classes.find((c) => c.key === selected);
+  const rows = snap.items.slice(0, 9);
 
   return (
     <motion.div
@@ -46,92 +43,59 @@ export default function Telemetry() {
     >
       {/* header */}
       <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-        <span className="col-heading">Network telemetry</span>
+        <span className="col-heading">Live job stream</span>
         <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">
           <span className="h-1.5 w-1.5 rounded-full bg-pos animate-pulse-dot" aria-hidden />
-          mainnet · epoch 1,284
+          mainnet · epoch {snap.epoch.toLocaleString("en-US")}
         </span>
       </div>
 
-      {/* provider classes */}
-      <div aria-label="Provider classes">
-        <div
-          aria-hidden
-          className="grid grid-cols-[1.3fr_1fr_0.8fr_88px] items-center gap-2 px-5 pb-1 pt-3 font-mono text-[10.5px] uppercase tracking-[0.13em] text-mute"
-        >
-          <span>Class</span>
-          <span className="text-right">Available</span>
-          <span className="text-right">Routing</span>
-          <span className="text-right">Load</span>
-        </div>
-        {snap.classes.map((c) => {
-          const active = c.key === selected;
-          return (
-            <button
-              key={c.key}
-              aria-pressed={active}
-              aria-label={`Show capacity curve for ${c.key}`}
-              onClick={() => setSelected(c.key)}
-              className={`grid w-full grid-cols-[1.3fr_1fr_0.8fr_88px] items-center gap-2 border-l-2 px-5 py-[9px] text-left transition-colors duration-150 ${
-                active
-                  ? "border-signal bg-[rgba(91,124,255,0.06)]"
-                  : "border-transparent hover:bg-[rgba(235,240,255,0.03)]"
-              }`}
-            >
-              <span className="flex flex-col">
-                <span className="font-mono text-[13px] font-medium tracking-[0.02em] text-ink">
-                  {c.key}
-                </span>
-                <span className="font-mono text-[10px] text-mute">
-                  {(c.utilization * 100).toFixed(1)}% utilized
-                </span>
-              </span>
-              <span
-                key={`${c.key}-${c.available}`}
-                className={`tnum text-right font-mono text-[13px] text-ink ${
-                  c.dir < 0 ? "flash-pos" : c.dir > 0 ? "flash-neg" : ""
-                }`}
+      {/* stream */}
+      <div className="max-h-[430px] overflow-hidden px-2 py-2" aria-label="Live job stream">
+        <AnimatePresence initial={false}>
+          {rows.map((i) => {
+            const s = itemStatusLabel(i);
+            return (
+              <motion.div
+                key={i.id}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: [0.7, 0, 0.3, 1] }}
               >
-                {c.available.toLocaleString("en-US")}
-              </span>
-              <span className="tnum text-right font-mono text-[12px] text-dim">
-                {fmtLatency(c.latency)}
-              </span>
-              <Sparkline
-                data={c.history}
-                up={c.dir <= 0}
-                className="justify-self-end"
-              />
-            </button>
-          );
-        })}
+                <Link
+                  href="/app"
+                  className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 rounded-[6px] px-3 py-[7px] transition-colors duration-150 hover:bg-[rgba(235,240,255,0.03)]"
+                >
+                  <span className="truncate font-mono text-[12.5px] text-ink">
+                    {itemTitle(i)}
+                  </span>
+                  <span className={`font-mono text-[11px] ${s.cls}`}>{s.label}</span>
+                  <span className="col-span-2 truncate font-mono text-[11px] text-mute">
+                    {itemDetail(i)}
+                  </span>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
-      {/* capacity / load curve */}
-      <div className="border-t border-line px-5 pb-4 pt-3">
-        <div className="mb-2 flex items-baseline justify-between">
-          <span className="col-heading">Capacity / load · {selected}</span>
-          <span className="tnum font-mono text-[11px] text-mute">
-            {sel ? `${sel.available.toLocaleString()} GPUs free` : ""}
-          </span>
-        </div>
-        <DepthChart curve={curve} width={520} height={110} className="h-[96px] w-full" />
-        <div className="mt-1 flex justify-between font-mono text-[10px] text-mute">
-          <span className="text-signal-bright">available</span>
-          <span className="tnum">median {fmtLatency(curve.mid)}</span>
-          <span className="text-violet">allocated</span>
-        </div>
-      </div>
-
-      {/* protocol strip */}
+      {/* approx strip */}
       <div className="flex items-center justify-between border-t border-line px-5 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-mute">
         <span>
-          queue <span className="tnum text-ink">{fmtCompact(snap.queueDepth, "")}</span> jobs
+          in flight <span className="tnum text-ink">{fmtTilde(snap.approx.jobsInFlight)}</span>
         </span>
         <span>
-          verified{" "}
-          <span className="tnum text-signal-bright">{snap.verificationRate.toFixed(2)}%</span>
+          latency{" "}
+          <span className="tnum text-signal-bright">
+            {fmtRangeMs(snap.approx.latencyLo, snap.approx.latencyHi)}
+          </span>{" "}
+          varies
         </span>
+        <Link href="/app" className="text-signal transition-colors hover:text-signal-bright">
+          console →
+        </Link>
       </div>
     </motion.div>
   );

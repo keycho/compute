@@ -1,19 +1,11 @@
 import Reveal from "@/components/ui/Reveal";
 import Scramble from "@/components/ui/Scramble";
 
-const PILLARS = [
-  {
-    title: "No infrastructure to manage",
-    body: "You never provision servers, images, or clusters. Describe the job — container, hardware class, verification policy — and the network runs it. Scaling up means changing a number, not an architecture.",
-  },
-  {
-    title: "No centralized scheduler",
-    body: "Routing happens in-protocol, weighted by latency, load, and provider reliability. No company decides whose job runs where, and no single outage can take the network down.",
-  },
-  {
-    title: "No single provider",
-    body: "Capacity comes from thousands of independent operators — workstations, render farms, and datacenters. Prices come from open participation, not a rate card.",
-  },
+const NETWORK_FACTS = [
+  "jobs are matched to GPUs in real time",
+  "execution is verified on completion",
+  "failed runs are retried or rerouted",
+  "workers are paid per successful output",
 ];
 
 export default function WhyQ0r() {
@@ -24,39 +16,55 @@ export default function WhyQ0r() {
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
           <Reveal>
             <p className="chip mb-6">
-              <Scramble text="WHY Q0R" />
+              <Scramble text="WHAT IS Q0R" />
             </p>
             <h2 className="display text-[clamp(2.2rem,4.2vw,3.6rem)]">
-              Why q0r<span className="text-signal">?</span>
+              A decentralized
+              <br />
+              compute network<span className="text-signal">.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="font-mono text-[15px] leading-[1.8] text-dim">
-              Traditional cloud compute is expensive, centralized, and
-              permissioned. Capacity sits in a handful of regions, priced by a
-              handful of companies, behind quotas and sales calls.
+            <p className="font-mono text-[15px] leading-[1.8] text-ink">
+              Jobs are not sent to cloud providers. They are routed to available
+              GPUs across a global mesh of independent machines.
             </p>
-            <p className="mt-5 font-mono text-[15px] leading-[1.8] text-ink">
-              q0r takes the opposite approach: it turns independent GPUs — from
-              a single workstation to an entire datacenter — into one global
-              execution network that anyone can use and anyone can join.
+            <p className="mt-5 font-mono text-[15px] leading-[1.8] text-dim">
+              Execution is not reserved — it is opportunistic. The network takes
+              whatever capacity exists right now, uses it, verifies the output,
+              and pays the machine that did the work.
             </p>
           </Reveal>
         </div>
 
-        <div className="mt-16 grid gap-0 md:grid-cols-3">
-          {PILLARS.map((p, i) => (
-            <Reveal
-              key={p.title}
-              delay={i * 0.08}
-              className={`border-line py-8 pr-8 md:border-l md:pl-8 ${i === 0 ? "md:border-l-0 md:pl-0" : ""}`}
-            >
-              <h3 className="font-display text-[18px] font-semibold tracking-[-0.01em] text-ink">
-                {p.title}
-              </h3>
-              <p className="mt-3 font-mono text-[13.5px] leading-[1.7] text-mute">{p.body}</p>
-            </Reveal>
-          ))}
+        <div className="mt-16 grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+          <Reveal delay={0.05}>
+            <p className="col-heading mb-5">Why it exists</p>
+            <p className="font-mono text-[14px] leading-[1.8] text-dim">
+              Compute is already distributed. It is just controlled by
+              centralized providers — priced by a rate card, gated by quotas,
+              parked behind sales calls.
+            </p>
+            <p className="mt-4 font-mono text-[14px] leading-[1.8] text-ink">
+              q0r exposes the underlying machines directly.
+            </p>
+          </Reveal>
+          <Reveal delay={0.12}>
+            <p className="col-heading mb-5">The network</p>
+            <ul className="flex flex-col">
+              {NETWORK_FACTS.map((f) => (
+                <li
+                  key={f}
+                  className="flex items-baseline gap-3 border-b border-line py-3.5 font-mono text-[14px] text-dim first:border-t"
+                >
+                  <span className="text-signal" aria-hidden>
+                    →
+                  </span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
         </div>
       </div>
     </section>

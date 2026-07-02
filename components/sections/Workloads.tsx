@@ -49,31 +49,37 @@ const WORKLOADS = [
   {
     icon: Icons.inference,
     title: "Inference",
+    tag: "qwen3-8b · llama-3.3 · whisper-v3",
     body: "Serve models close to your users. Latency-based routing places requests on the nearest healthy GPU.",
   },
   {
     icon: Icons.training,
     title: "Training",
+    tag: "lora · dreambooth · rlhf",
     body: "Fan a run out across hundreds of GPUs without owning one. Checkpoints stream back as you go.",
   },
   {
     icon: Icons.rendering,
     title: "Rendering",
+    tag: "sdxl · flux-dev · cycles",
     body: "Frames render in parallel across the mesh and return assembled. Farms of any size, on demand.",
   },
   {
     icon: Icons.simulation,
     title: "Simulation",
+    tag: "fold-md · cfd-mesh",
     body: "Physics, weather, and agent runs on burst capacity — pay for the hours the run actually takes.",
   },
   {
     icon: Icons.video,
     title: "Video generation",
+    tag: "wan-2.2 · hunyuan-vid",
     body: "Diffusion and video pipelines on current-generation hardware, without a reservation queue.",
   },
   {
     icon: Icons.scientific,
     title: "Scientific compute",
+    tag: "batch · long-running · verified",
     body: "Long-running batch jobs with verifiable results — every output ships with its execution proof.",
   },
 ];
@@ -114,7 +120,10 @@ export default function Workloads() {
                     {w.icon}
                   </span>
                 </div>
-                <p className="font-mono text-[13px] leading-[1.7] text-mute">{w.body}</p>
+                <p className="flex-1 font-mono text-[13px] leading-[1.7] text-mute">{w.body}</p>
+                <p className="mt-5 border-t border-line pt-3 font-mono text-[10.5px] tracking-[0.08em] text-mute transition-colors duration-300 group-hover:text-signal">
+                  {w.tag}
+                </p>
               </article>
             </Reveal>
           ))}

@@ -2,40 +2,35 @@ import Reveal from "@/components/ui/Reveal";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 /**
- * The lifecycle of a job, top to bottom. No accordion, no reveal on
- * click — the whole path is visible at once, the way a diagram would be.
+ * The lifecycle of a job, top to bottom — visible at once, the way a
+ * diagram would be. Failure is part of the path, so it gets a step.
  */
 
 const STEPS = [
   {
     n: "01",
-    title: "Applications submit workloads.",
-    body: "A signed request describes the job: container image, hardware class, replica count, verification policy.",
+    title: "You submit a job.",
+    body: "A signed request: container, hardware class, verification policy. No reservation, no quota — the job enters the mesh directly.",
   },
   {
     n: "02",
-    title: "The scheduler discovers providers.",
-    body: "Discovery scores every eligible provider on latency, current load, stake, and reliability history. Placement lands in about 100ms.",
+    title: "The network finds a worker.",
+    body: "Matching happens in real time against whatever capacity exists right now — scored on latency, load, and reliability history.",
   },
   {
     n: "03",
-    title: "Jobs are encrypted and distributed.",
-    body: "Payloads are encrypted end-to-end. Providers receive only what they need to execute — never your data in the clear.",
+    title: "The worker executes and streams results back.",
+    body: "Work runs in an attested environment. Output streams back as it is produced, with a proof attached on completion.",
   },
   {
     n: "04",
-    title: "Providers execute.",
-    body: "Work runs in attested environments on hardware that matches the request. If a provider degrades, the job re-routes mid-flight.",
+    title: "If a node fails, the job reroutes automatically.",
+    body: "Dropouts, thermal throttling, dead peers — all normal. The job moves to another worker and keeps going. Failed runs are retried.",
   },
   {
     n: "05",
-    title: "Results are verified.",
-    body: "Every output returns with a proof of execution. The network accepts only what it can verify; failed attestation slashes the provider's stake.",
-  },
-  {
-    n: "06",
-    title: "Rewards settle automatically.",
-    body: "Verified work pays providers in USDC each epoch. Applications pay for completed results — nothing else.",
+    title: "Verified output gets paid.",
+    body: "The network settles per successful result, each epoch, in USDC. Unverifiable work is not paid.",
   },
 ];
 
@@ -45,15 +40,15 @@ export default function HowItWorks() {
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[rgba(3,3,4,0.62)]" />
       <div className="relative">
         <SectionHeader
-          chip="HOW Q0R WORKS"
+          chip="HOW IT WORKS"
           title={
             <>
-              From workload
+              Execution is
               <br />
-              to verified result<span className="text-signal">.</span>
+              opportunistic<span className="text-signal">.</span>
             </>
           }
-          body="Six steps, all in-protocol, all observable in real time. This is the entire lifecycle of a job."
+          body="Nothing is reserved ahead of time. The network uses the capacity that exists at the moment you need it — and routes around whatever breaks."
         />
 
         <div className="container-x mt-16 max-w-[820px]">
