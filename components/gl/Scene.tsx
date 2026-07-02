@@ -2,10 +2,11 @@
 
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Bloom, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
+import { EffectComposer, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { viewState } from "@/lib/viewState";
 import Crystal from "./Crystal";
+import Dither from "./Dither";
 import Particles, { type ParticleUniforms } from "./Particles";
 import NetworkMesh from "./NetworkMesh";
 
@@ -114,17 +115,11 @@ export default function Scene() {
             <Particles uniformsRef={particleUniforms} />
           </group>
           <EffectComposer>
-            {/* tight bloom: only the HDR core blooms — the haze was
-                washing the pixel grains into smoke */}
-            <Bloom
-              mipmapBlur
-              intensity={0.3}
-              luminanceThreshold={0.5}
-              luminanceSmoothing={0.25}
-              radius={0.45}
-            />
+            {/* no bloom — bloom is a blur pass by definition. vignette
+                shapes the light, then the dither quantizes every
+                gradient into patterned pixels: nothing can render soft */}
             <Vignette darkness={0.72} offset={0.28} />
-            <Noise opacity={0.06} />
+            <Dither levels={5} />
           </EffectComposer>
         </Suspense>
       </Canvas>
