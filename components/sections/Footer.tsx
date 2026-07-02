@@ -3,12 +3,20 @@ import { Wordmark } from "@/components/ui/Logo";
 
 const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: string }> }> = [
   {
+    heading: "Use",
+    links: [
+      { label: "Run AI", href: "/run" },
+      { label: "Generate images", href: "/generate" },
+      { label: "Share GPU", href: "/share" },
+      { label: "Console", href: "/app" },
+    ],
+  },
+  {
     heading: "Protocol",
     links: [
-      { label: "Why q0r", href: "#why" },
-      { label: "How it works", href: "#how" },
-      { label: "Workloads", href: "#workloads" },
-      { label: "Token", href: "#token" },
+      { label: "Why q0r", href: "/#why" },
+      { label: "How it works", href: "/#how" },
+      { label: "Stake Q0R", href: "/#token" },
     ],
   },
   {
@@ -43,7 +51,7 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
 export default function Footer() {
   return (
     <footer className="hairline-t relative overflow-hidden bg-[rgba(3,3,4,0.82)] backdrop-blur-[6px]">
-      <div className="container-x grid gap-12 py-20 md:grid-cols-[1.2fr_repeat(4,1fr)]">
+      <div className="container-x grid gap-12 py-20 md:grid-cols-[1.2fr_repeat(5,1fr)]">
         <div>
           <Wordmark />
           <p className="mt-5 max-w-[260px] font-mono text-[12.5px] leading-[1.7] text-mute">

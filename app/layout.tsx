@@ -18,12 +18,12 @@ const plex = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "q0r — The Execution Layer for Decentralized Compute",
+  title: "q0r — Run AI on People\u2019s GPUs",
   description:
-    "q0r is a decentralized execution protocol. Applications submit workloads; the network discovers providers, routes execution, verifies results, and settles rewards automatically.",
+    "Run AI, generate images, share your GPU, earn from idle hardware. A decentralized mesh of independent GPUs quietly powers all of it.",
   openGraph: {
     title: "q0r",
-    description: "The execution layer for decentralized compute.",
+    description: "Run AI. Generate images. Share your GPU. Earn from idle hardware.",
     type: "website",
   },
 };

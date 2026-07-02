@@ -17,30 +17,33 @@ export default function CtaBand() {
       <div className="container-x relative flex flex-col items-center py-[clamp(130px,18vh,210px)] text-center">
         <Reveal>
           <p className="chip mb-7">
-            <Scramble text="THE NETWORK IS LIVE" />
+            <Scramble text="THE MESH IS LIVE" />
           </p>
         </Reveal>
         <Reveal delay={0.1}>
           <h2 className="display text-[clamp(2.6rem,6vw,5.4rem)]">
-            Run your first job
+            Run something
             <br />
-            today<span className="text-signal">.</span>
+            on it<span className="text-signal">.</span>
           </h2>
         </Reveal>
         <Reveal delay={0.2}>
           <p className="mx-auto mt-7 max-w-[480px] font-mono text-[14px] leading-[1.75] text-dim">
-            Capacity is online and the mesh is verifying work right now.
-            Submit a workload in minutes, or point your idle GPUs at the
-            network and start earning.
+            Ask a model a question. Generate four frames. Point an idle GPU
+            at the network and watch it earn. The mesh is verifying work
+            right now.
           </p>
         </Reveal>
         <Reveal delay={0.3}>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Button href="/app" size="lg">
-              Launch App <span aria-hidden>→</span>
+            <Button href="/run" size="lg">
+              Run AI <span aria-hidden>→</span>
             </Button>
-            <Button href="#providers" size="lg" variant="ghost">
-              Share your compute
+            <Button href="/generate" size="lg" variant="ghost">
+              Generate images
+            </Button>
+            <Button href="/share" size="lg" variant="ghost">
+              Share your GPU
             </Button>
           </div>
         </Reveal>
