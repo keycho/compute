@@ -5,10 +5,10 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
   {
     heading: "Use",
     links: [
-      { label: "Run AI", href: "/run" },
-      { label: "Generate images", href: "/generate" },
-      { label: "Share GPU", href: "/share" },
-      { label: "Console", href: "/app" },
+      { label: "Execute", href: "/execute" },
+      { label: "Create", href: "/create" },
+      { label: "Supply", href: "/supply" },
+      { label: "Stake", href: "/#token" },
     ],
   },
   {
@@ -20,12 +20,12 @@ const COLUMNS: Array<{ heading: string; links: Array<{ label: string; href: stri
     ],
   },
   {
-    heading: "Network",
+    heading: "Explore",
     links: [
-      { label: "Providers", href: "#providers" },
-      { label: "Live state", href: "#network" },
-      { label: "Capacity", href: "#network" },
-      { label: "Status", href: "#network" },
+      { label: "Live explorer", href: "/explore" },
+      { label: "Network", href: "#network" },
+      { label: "Blocks", href: "/explore" },
+      { label: "Jobs", href: "/explore" },
     ],
   },
   {

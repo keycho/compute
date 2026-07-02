@@ -2,12 +2,25 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Button from "@/components/ui/Button";
 import Scramble from "@/components/ui/Scramble";
 import { useFeed } from "@/lib/useFeed";
 import Telemetry from "./Telemetry";
 
 const ease = [0.7, 0, 0.3, 1] as const;
+
+// the four verbs of the protocol. explore is deliberately not here — it
+// lives in the nav and inside every receipt instead.
+const ACTIONS = [
+  {
+    label: "Execute",
+    href: "/execute",
+    sub: "chat models · reasoning · code · agents",
+    primary: true,
+  },
+  { label: "Create", href: "/create", sub: "images · video · audio" },
+  { label: "Supply", href: "/supply", sub: "download worker · join network · start earning" },
+  { label: "Stake", href: "/#token", sub: "stake q0r · back workers · earn protocol fees" },
+];
 
 // MotionConfig reducedMotion="user" (app/layout.tsx) strips the transform
 // and blur for reduced-motion users while opacity still resolves to 1, so
@@ -35,41 +48,55 @@ export default function Hero() {
       <div className="container-x relative grid w-full items-center gap-14 pb-24 pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
         <div>
           <motion.p {...enter(0.1)} className="chip mb-7">
-            <Scramble text="RUN AI ON PEOPLE'S GPUS" duration={700} />
+            <Scramble text="COMPUTE, OWNED BY PEOPLE" duration={700} />
           </motion.p>
 
           <motion.h1
             {...enter(0.22)}
-            className="display text-[clamp(2.6rem,4.6vw,4.6rem)]"
+            className="display text-[clamp(2.4rem,4.3vw,4.2rem)]"
           >
-            Compute, owned
+            What do you want
             <br />
-            by people<span className="text-signal">.</span>
+            to execute<span className="text-signal">?</span>
           </motion.h1>
 
-          <motion.div
+          <motion.p
             {...enter(0.38)}
-            className="mt-7 flex flex-col gap-1 font-mono text-[15.5px] leading-[1.7]"
+            className="mt-6 max-w-[520px] font-mono text-[14.5px] leading-[1.7]"
           >
-            <p className="text-ink">Run AI.</p>
-            <p className="text-ink">Generate images.</p>
-            <p className="text-dim">Share your GPU.</p>
-            <p className="text-dim">Earn from idle hardware.</p>
-          </motion.div>
+            <span className="text-ink">AI. Images. Video. Code. Custom containers.</span>{" "}
+            <span className="text-dim">
+              One mesh of people&apos;s GPUs runs it all — and pays the people who own them.
+            </span>
+          </motion.p>
 
-          <motion.div {...enter(0.52)} className="mt-10 grid max-w-[560px] grid-cols-2 gap-3">
-            <Button href="/run" size="lg" className="w-full">
-              Run AI <span aria-hidden>→</span>
-            </Button>
-            <Button href="/generate" size="lg" variant="ghost" className="w-full">
-              Generate
-            </Button>
-            <Button href="/share" size="lg" variant="ghost" className="w-full">
-              Share GPU
-            </Button>
-            <Button href="/app" size="lg" variant="ghost" className="w-full">
-              Open Console
-            </Button>
+          <motion.div {...enter(0.52)} className="mt-10 grid max-w-[600px] gap-3 sm:grid-cols-2">
+            {ACTIONS.map((a) => (
+              <Link
+                key={a.label}
+                href={a.href}
+                className={`group rounded-[8px] border px-5 py-4 transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] ${
+                  a.primary
+                    ? "border-[rgba(91,124,255,0.55)] bg-[rgba(91,124,255,0.1)] hover:bg-[rgba(91,124,255,0.16)] hover:shadow-[0_0_28px_rgba(91,124,255,0.25)]"
+                    : "border-line bg-[rgba(8,9,14,0.6)] hover:border-[rgba(91,124,255,0.4)] hover:bg-[rgba(91,124,255,0.05)]"
+                }`}
+              >
+                <span className="flex items-center justify-between font-display text-[17px] font-semibold tracking-[-0.01em] text-ink">
+                  {a.label}
+                  <span
+                    aria-hidden
+                    className={`transition-transform duration-300 group-hover:translate-x-0.5 ${
+                      a.primary ? "text-signal-bright" : "text-mute group-hover:text-signal"
+                    }`}
+                  >
+                    →
+                  </span>
+                </span>
+                <span className="mt-1.5 block font-mono text-[10.5px] uppercase tracking-[0.08em] text-mute">
+                  {a.sub}
+                </span>
+              </Link>
+            ))}
           </motion.div>
 
           <motion.p
@@ -77,8 +104,12 @@ export default function Hero() {
             className="mt-8 max-w-[520px] font-mono text-[12.5px] leading-[1.7] text-mute"
           >
             Underneath: a decentralized mesh of independent GPUs. Jobs route to
-            available hardware, execute in verified environments, and pay the
-            people who ran them.{" "}
+            available hardware, execute in verified environments, and every
+            result comes back with a receipt you can open in the{" "}
+            <Link href="/explore" className="text-signal hover:text-signal-bright">
+              explorer
+            </Link>
+            .{" "}
             <Link href="#why" className="text-signal hover:text-signal-bright">
               how it works ↓
             </Link>

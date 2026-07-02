@@ -64,7 +64,7 @@ export default function Telemetry() {
                 transition={{ duration: 0.4, ease: [0.7, 0, 0.3, 1] }}
               >
                 <Link
-                  href="/app"
+                  href="/explore"
                   className="grid grid-cols-[1fr_auto] items-baseline gap-x-3 rounded-[6px] px-3 py-[7px] transition-colors duration-150 hover:bg-[rgba(235,240,255,0.03)]"
                 >
                   <span className="truncate font-mono text-[12.5px] text-ink">
@@ -96,8 +96,8 @@ export default function Telemetry() {
           </span>{" "}
           varies
         </span>
-        <Link href="/app" className="text-signal transition-colors hover:text-signal-bright">
-          console →
+        <Link href="/explore" className="text-signal transition-colors hover:text-signal-bright">
+          explorer →
         </Link>
       </div>
     </motion.div>

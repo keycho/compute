@@ -29,21 +29,21 @@ export default function CtaBand() {
         </Reveal>
         <Reveal delay={0.2}>
           <p className="mx-auto mt-7 max-w-[480px] font-mono text-[14px] leading-[1.75] text-dim">
-            Ask a model a question. Generate four frames. Point an idle GPU
-            at the network and watch it earn. The mesh is verifying work
-            right now.
+            Ask a model a question. Render four frames. Point an idle GPU
+            at the network and watch it earn. Every job leaves a receipt
+            in the explorer.
           </p>
         </Reveal>
         <Reveal delay={0.3}>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Button href="/run" size="lg">
-              Run AI <span aria-hidden>→</span>
+            <Button href="/execute" size="lg">
+              Execute <span aria-hidden>→</span>
             </Button>
-            <Button href="/generate" size="lg" variant="ghost">
-              Generate images
+            <Button href="/create" size="lg" variant="ghost">
+              Create
             </Button>
-            <Button href="/share" size="lg" variant="ghost">
-              Share your GPU
+            <Button href="/supply" size="lg" variant="ghost">
+              Supply
             </Button>
           </div>
         </Reveal>
