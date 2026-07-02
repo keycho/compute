@@ -3,6 +3,7 @@
 import { useFeed } from "@/lib/useFeed";
 import { fmtRangeMs, fmtTildeRange } from "@/lib/format";
 import Reveal from "@/components/ui/Reveal";
+import { workerStatusText } from "@/components/ui/feedFormat";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 /**
@@ -96,50 +97,46 @@ export default function NetworkState() {
               </span>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              {workers.map((w) => (
-                <div key={w.node} className="glass p-4">
-                  <div className="flex items-baseline justify-between">
-                    <span className="font-mono text-[13px] font-medium text-ink">
-                      {w.node}
-                    </span>
-                    <span
-                      className={`font-mono text-[10.5px] uppercase tracking-[0.1em] ${
-                        w.status === "unstable"
-                          ? "text-neg"
-                          : w.status === "throttling"
-                            ? "text-violet"
-                            : "text-pos"
-                      }`}
-                    >
-                      {w.status}
-                    </span>
+              {workers.map((w) => {
+                const st = workerStatusText(w);
+                const bad =
+                  w.status === "unstable" || w.status === "throttling" || w.status === "offline";
+                return (
+                  <div key={w.node} className="glass p-4">
+                    <div className="flex items-baseline justify-between">
+                      <span className="font-mono text-[13px] font-medium text-ink">{w.node}</span>
+                      <span
+                        className={`font-mono text-[10.5px] uppercase tracking-[0.1em] ${st.cls}`}
+                      >
+                        {st.label}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 font-mono text-[11px] text-mute">
+                      {w.region} · gpu: {w.gpu}
+                    </p>
+                    <div className="mt-3 flex items-baseline justify-between font-mono text-[11px]">
+                      <span className="text-mute">
+                        load {w.loadHist[0]}% → {w.loadHist[1]}% → {w.loadHist[2]}%{" "}
+                        <span className="text-mute/70">(fluctuating)</span>
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-[4px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.06)]">
+                      <div
+                        className={`h-full rounded-full transition-[width] duration-1000 ${
+                          bad ? "bg-neg/70" : "bg-signal/70"
+                        }`}
+                        style={{ width: `${w.loadHist[2]}%` }}
+                      />
+                    </div>
+                    <div className="mt-3 flex items-baseline justify-between font-mono text-[11px]">
+                      <span className="text-mute">
+                        {w.note ? `note: ${w.note}` : "earnings (epoch)"}
+                      </span>
+                      <span className="tnum text-cyan">${w.earningsEpoch.toFixed(2)}</span>
+                    </div>
                   </div>
-                  <p className="mt-0.5 font-mono text-[11px] text-mute">
-                    {w.region} · gpu: {w.gpu}
-                  </p>
-                  <div className="mt-3 flex items-baseline justify-between font-mono text-[11px]">
-                    <span className="text-mute">
-                      load {Math.round(w.loadLo)}–{Math.round(w.loadHi)}%{" "}
-                      <span className="text-mute/70">fluctuating</span>
-                    </span>
-                    <span className="tnum text-dim">now ~{Math.round(w.loadNow)}%</span>
-                  </div>
-                  <div className="mt-1.5 h-[4px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.06)]">
-                    <div
-                      className={`h-full rounded-full transition-[width] duration-1000 ${
-                        w.status === "unstable" || w.status === "throttling" ? "bg-neg/70" : "bg-signal/70"
-                      }`}
-                      style={{ width: `${w.loadNow}%` }}
-                    />
-                  </div>
-                  <div className="mt-3 flex items-baseline justify-between font-mono text-[11px]">
-                    <span className="text-mute">
-                      {w.note ? `note: ${w.note}` : "earnings (epoch)"}
-                    </span>
-                    <span className="tnum text-cyan">${w.earningsEpoch.toFixed(2)}</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Reveal>
         </div>

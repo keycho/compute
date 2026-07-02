@@ -3,7 +3,6 @@
 import Reveal from "@/components/ui/Reveal";
 import Scramble from "@/components/ui/Scramble";
 import { useFeed } from "@/lib/useFeed";
-import { fmtCompact, fmtTilde } from "@/lib/format";
 
 /**
  * Not a tokenomics page — a live settlement and staking system being
@@ -81,40 +80,36 @@ export default function Token() {
               </div>
               <StateRow
                 label="$Q0R staked"
-                value={`${a.stakedM.toFixed(1)}m`}
-                note="fluctuating across routing pools"
+                value="~14m–15m"
+                note="shifting across routing pools"
               />
               <StateRow
                 label="protocol revenue (epoch)"
-                value={fmtCompact(a.revenueEpoch)}
-                note="from completed jobs"
+                value="streaming"
+                note="batch value: high (unfinalized)"
               />
               <StateRow
                 label="burn activity"
                 value={
-                  a.lastBurn
-                    ? `${a.lastBurn.amount.toLocaleString()} Q0R`
-                    : "updating"
+                  a.lastBurn?.amount ? `${a.lastBurn.amount.toLocaleString()} Q0R` : "updating"
                 }
                 note={a.lastBurn ? `last batch · ${a.lastBurn.state}` : "per execution batch"}
                 cls="text-cyan"
               />
-              <StateRow
-                label="staker rewards"
-                value={fmtCompact(a.rewardsPaidEpoch * 0.06)}
-                note="USDC · distributing"
-              />
+              <StateRow label="staker rewards" value="distributing" note="USDC · per epoch" />
               <StateRow
                 label="buyback flow"
                 value={
-                  a.lastBuyback ? `${a.lastBuyback.amount.toLocaleString()} Q0R` : "queued"
+                  a.lastBuyback?.amount
+                    ? `${a.lastBuyback.amount.toLocaleString()} Q0R`
+                    : "queued"
                 }
                 note={a.lastBuyback ? `open market · ${a.lastBuyback.state}` : "awaiting batch"}
                 cls="text-cyan"
               />
               <StateRow
                 label="slashing events"
-                value={a.slashesEpoch}
+                value={`${a.slashesEpoch} observed`}
                 note="failed or invalid execution"
                 cls="text-neg"
               />
@@ -123,16 +118,15 @@ export default function Token() {
                   <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
                     $Q0R burned · rolling
                   </p>
-                  <p className="tnum mt-1 font-display text-[22px] font-semibold text-ink">
-                    {fmtTilde(a.burnedTotal).replace("~", "~")}
-                  </p>
+                  <p className="tnum mt-1 font-display text-[22px] font-semibold text-ink">~8m+</p>
+                  <p className="font-mono text-[10px] text-mute">partial visibility</p>
                 </div>
                 <div>
                   <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
                     pending settlement
                   </p>
                   <p className="tnum mt-1 font-display text-[22px] font-semibold text-mute">
-                    {fmtTilde(a.pendingSettlement).replace("~", "~$")}
+                    queued
                   </p>
                   <p className="font-mono text-[10px] text-mute">finalizing next epoch window</p>
                 </div>

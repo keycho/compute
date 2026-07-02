@@ -16,11 +16,8 @@ export default function Ticker() {
       <span key={i.id} className="mx-7 inline-flex items-baseline gap-3 font-mono text-[12px]">
         <span className="tracking-[0.02em] text-dim">{itemTitle(i)}</span>
         <span className={s.cls}>{s.label}</span>
-        {i.kind === "job" && i.status === "running" && (
-          <span className="tnum text-mute">{Math.round(i.latencyNow)}ms</span>
-        )}
-        {i.kind === "job" && i.status === "completed" && i.reward !== undefined && (
-          <span className="tnum text-mute">${i.reward.toFixed(2)}</span>
+        {i.kind === "job" && i.entity.reward !== undefined && (
+          <span className="tnum text-mute">${i.entity.reward.toFixed(2)}</span>
         )}
         <span className="ml-4 text-mute" aria-hidden>
           ◆

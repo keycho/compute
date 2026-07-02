@@ -8,19 +8,25 @@ import * as THREE from "three";
 import { AnimatePresence, motion } from "framer-motion";
 import NetworkMesh from "@/components/gl/NetworkMesh";
 import { Wordmark } from "@/components/ui/Logo";
-import { itemDetail, itemStatusLabel, itemTitle } from "@/components/ui/feedFormat";
+import {
+  itemDetail,
+  itemStatusLabel,
+  itemTitle,
+  workerStatusText,
+} from "@/components/ui/feedFormat";
 import { fmtRangeMs, fmtTildeRange } from "@/lib/format";
 import { createNetwork, stepNetwork } from "@/lib/network";
 import { mulberry32 } from "@/lib/prng";
 import { useFeed } from "@/lib/useFeed";
-import type { FeedItem, JobItem, TokenItem, WorkerItem } from "@/lib/feed";
+import type { EcoEvt, FeedItem, JobEntity, WorkerEntity } from "@/lib/feed";
 import { bindPointer, viewState } from "@/lib/viewState";
 
 /**
  * The network console: a live event stream over the living mesh.
  * Every feed row is inspectable in place — clicking one opens a
  * block-explorer drawer with the structured truth of that event.
- * No separate pages, no analytics chrome. A system, in motion.
+ * Locally true, globally incomplete: entities are snapshots the system
+ * happens to know about, not a database view.
  */
 
 function ConsoleRig() {
@@ -37,6 +43,21 @@ function ConsoleRig() {
     camera.lookAt(0, 0, -4);
   });
   return null;
+}
+
+/* ---------- selection model ---------- */
+
+type Sel =
+  | { id: string; title: string; t: "job"; j: JobEntity }
+  | { id: string; title: string; t: "worker"; w: WorkerEntity }
+  | { id: string; title: string; t: "eco"; e: EcoEvt };
+
+function selFromItem(i: FeedItem): Sel {
+  if (i.kind === "economy")
+    return { id: i.id, title: `EVENT #${i.block.toLocaleString("en-US")}`, t: "eco", e: i };
+  if (i.kind === "job")
+    return { id: i.id, title: `BLOCK #${i.block.toLocaleString("en-US")}`, t: "job", j: i.entity };
+  return { id: i.id, title: `BLOCK #${i.block.toLocaleString("en-US")}`, t: "worker", w: i.entity };
 }
 
 /* ---------- explorer drawer renderers ---------- */
@@ -59,22 +80,32 @@ function BlockSection({ title, children }: { title: string; children: React.Reac
   );
 }
 
-function JobBlock({ j, onPick }: { j: JobItem; onPick: (hash: string) => void }) {
-  const s = itemStatusLabel(j);
+const PHASE_CLS: Record<string, string> = {
+  executing: "text-signal-bright",
+  rerouting: "text-violet",
+  failed: "text-neg",
+  completed: "text-pos",
+  settled: "text-pos",
+};
+
+function JobBlock({ j, onPickNode }: { j: JobEntity; onPickNode: (node: string) => void }) {
   return (
     <>
       <BlockSection title="task">
         <Field k="type" v="job_execution" />
         <Field k="workload" v={`${j.type} / ${j.model}`} cls="text-ink" />
         <Field k="hash" v={j.hash} />
-        <Field k="status" v={j.status} cls={s.cls} />
-        <Field k="finalized" v={j.finalized ? "true" : "false"} />
+        <Field k="status" v={j.phase} cls={PHASE_CLS[j.phase] ?? "text-dim"} />
+        <Field k="finalized" v={j.settlement === "settled" ? "true" : "false"} />
       </BlockSection>
       <BlockSection title="execution">
         <Field
           k="node"
           v={
-            <button onClick={() => onPick(j.node)} className="text-signal hover:text-signal-bright">
+            <button
+              onClick={() => onPickNode(j.node)}
+              className="text-signal hover:text-signal-bright"
+            >
               {j.node}
             </button>
           }
@@ -83,38 +114,53 @@ function JobBlock({ j, onPick }: { j: JobItem; onPick: (hash: string) => void })
         {j.rerouteReason && <Field k="reroute reason" v={j.rerouteReason} cls="text-violet" />}
         <Field k="gpu" v={j.gpu} />
         <Field k="latency" v={fmtRangeMs(j.latencyLo, j.latencyHi)} />
-        <Field k="observed" v={`${Math.round(j.latencyNow)}ms`} />
+        <Field
+          k="latency state"
+          v={j.latencyState}
+          cls={j.latencyState === "stable" ? "text-pos" : "text-violet"}
+        />
         <Field k="retries" v={j.retries} cls={j.retries > 0 ? "text-violet" : undefined} />
-        {j.status === "running" && (
+        {(j.phase === "executing" || j.phase === "rerouting") && (
           <Field k="progress" v={`${Math.round(j.progress)}%`} cls="text-signal-bright" />
         )}
       </BlockSection>
       <BlockSection title="result">
-        {j.status === "completed" && (
-          <>
-            <Field k="verified" v="output accepted" cls="text-pos" />
-          </>
+        {(j.phase === "completed" || j.phase === "settled") && (
+          <Field k="verified" v="output accepted" cls="text-pos" />
         )}
-        {j.status === "pending finalization" && (
-          <Field k="verified" v="awaiting settlement" cls="text-mute" />
+        {j.phase === "failed" && (
+          <Field k="verified" v="rejected · retry scheduled" cls="text-neg" />
         )}
-        {j.status === "failed" && <Field k="verified" v="rejected · retry scheduled" cls="text-neg" />}
-        {(j.status === "running" || j.status === "rerouted") && (
+        {j.phase !== "completed" && j.phase !== "settled" && j.phase !== "failed" && (
           <Field k="verified" v="in flight" cls="text-mute" />
         )}
       </BlockSection>
       {j.reward !== undefined && (
         <BlockSection title="economics">
           <Field k="reward" v={`${j.reward.toFixed(2)} USDC`} cls="text-cyan" />
-          <Field k="settled" v={j.finalized ? `epoch 1,284` : "pending"} />
+          <Field
+            k="settlement"
+            v={j.settlement === "settled" ? "epoch 1,284" : j.settlement}
+            cls={j.settlement === "settled" ? "text-pos" : "text-mute"}
+          />
         </BlockSection>
       )}
       <BlockSection title="trace">
         <p className="font-mono text-[11.5px] leading-[1.9] text-dim">
-          {j.trace.map((t, i) => (
+          {j.trace.map((t: string, i: number) => (
             <span key={i}>
               {i > 0 && <span className="text-mute"> → </span>}
-              <span className={t.startsWith("rerouted") ? "text-violet" : t === "paid" ? "text-pos" : ""}>
+              <span
+                className={
+                  t.startsWith("rerouted")
+                    ? "text-violet"
+                    : t === "paid"
+                      ? "text-pos"
+                      : t.startsWith("failed")
+                        ? "text-neg"
+                        : ""
+                }
+              >
                 {t}
               </span>
             </span>
@@ -130,40 +176,38 @@ function WorkerBlock({
   jobs,
   onPickJob,
 }: {
-  w: WorkerItem;
-  jobs: JobItem[];
-  onPickJob: (j: JobItem) => void;
+  w: WorkerEntity;
+  jobs: JobEntity[];
+  onPickJob: (j: JobEntity) => void;
 }) {
-  const recent = jobs.filter((j) => j.node === w.node).slice(0, 4);
+  const st = workerStatusText(w);
+  const recent = jobs.filter((j) => j.node === w.node || j.previousNode === w.node).slice(0, 4);
   return (
     <>
       <BlockSection title="node">
         <Field k="id" v={w.node} cls="text-ink" />
         <Field k="region" v={w.region} />
-        <Field
-          k="status"
-          v={w.status}
-          cls={
-            w.status === "unstable"
-              ? "text-neg"
-              : w.status === "throttling"
-                ? "text-violet"
-                : "text-pos"
-          }
-        />
+        <Field k="status" v={st.label} cls={st.cls} />
         <Field k="gpu" v={w.gpu} />
         {w.note && <Field k="note" v={w.note} cls="text-violet" />}
+        {w.failMemory > 1.5 && (
+          <Field k="failure memory" v="elevated · reroute odds up" cls="text-violet" />
+        )}
       </BlockSection>
       <BlockSection title="load">
         <p className="font-mono text-[12px] text-dim">
-          {Math.round(w.loadLo)}% <span className="text-mute">→</span> {Math.round(w.loadNow)}%{" "}
-          <span className="text-mute">→</span> {Math.round(w.loadHi)}%{" "}
+          {w.loadHist[0]}% <span className="text-mute">→</span> {w.loadHist[1]}%{" "}
+          <span className="text-mute">→</span> {w.loadHist[2]}%{" "}
           <span className="text-mute">(fluctuating)</span>
         </p>
         <div className="mt-2 h-[4px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.06)]">
           <div
-            className={`h-full rounded-full transition-[width] duration-1000 ${w.status === "unstable" || w.status === "throttling" ? "bg-neg/70" : "bg-signal/70"}`}
-            style={{ width: `${w.loadNow}%` }}
+            className={`h-full rounded-full transition-[width] duration-1000 ${
+              w.status === "unstable" || w.status === "throttling" || w.status === "offline"
+                ? "bg-neg/70"
+                : "bg-signal/70"
+            }`}
+            style={{ width: `${w.loadHist[2]}%` }}
           />
         </div>
       </BlockSection>
@@ -174,39 +218,43 @@ function WorkerBlock({
         {recent.length === 0 && (
           <p className="font-mono text-[11.5px] text-mute">nothing in the current window</p>
         )}
-        {recent.map((j) => {
-          const s = itemStatusLabel(j);
-          return (
-            <button
-              key={j.id}
-              onClick={() => onPickJob(j)}
-              className="flex w-full items-baseline justify-between py-[5px] text-left hover:bg-[rgba(235,240,255,0.03)]"
-            >
-              <span className="font-mono text-[11.5px] text-signal">{j.hash}</span>
-              <span className={`font-mono text-[11px] ${s.cls}`}>{j.status}</span>
-            </button>
-          );
-        })}
+        {recent.map((j) => (
+          <button
+            key={j.id}
+            onClick={() => onPickJob(j)}
+            className="flex w-full items-baseline justify-between py-[5px] text-left hover:bg-[rgba(235,240,255,0.03)]"
+          >
+            <span className="font-mono text-[11.5px] text-signal">{j.hash}</span>
+            <span className={`font-mono text-[11px] ${PHASE_CLS[j.phase] ?? "text-dim"}`}>
+              {j.phase}
+            </span>
+          </button>
+        ))}
       </BlockSection>
     </>
   );
 }
 
-function TokenBlock({ t }: { t: TokenItem }) {
+function EcoBlock({ e }: { e: EcoEvt }) {
   return (
     <>
       <BlockSection title="event">
-        <Field k="type" v={t.type} cls={t.type === "slash" ? "text-neg" : "text-cyan"} />
-        <Field k="amount" v={`${t.amount.toLocaleString()} ${t.unit}`} cls="text-ink" />
-        <Field k="source" v={t.source} />
-        {t.node && <Field k="node" v={t.node} />}
-        <Field k="state" v={t.state} cls={t.state === "pending" ? "text-mute" : "text-pos"} />
+        <Field k="type" v={e.evt} cls={e.evt === "slash_event" ? "text-neg" : "text-cyan"} />
+        {e.amount !== undefined && (
+          <Field k="amount" v={`${e.amount.toLocaleString()} ${e.unit}`} cls="text-ink" />
+        )}
+        {e.note && <Field k="context" v={e.note} />}
+        {e.node && <Field k="node" v={e.node} />}
+        <Field k="state" v={e.state} cls={e.state === "finalized" ? "text-pos" : "text-mute"} />
+        <Field k="scope" v={e.scope} cls="text-mute" />
       </BlockSection>
       <BlockSection title="context">
         <p className="font-mono text-[11.5px] leading-[1.8] text-mute">
-          {t.type === "slash"
+          {e.evt === "slash_event"
             ? "invalid execution reduces trust: stake down, routing weight down. failure is part of system behavior."
-            : "burn is not scheduled. it happens when compute happens — a share of execution fees buys $Q0R and retires it."}
+            : e.evt === "stake_shift"
+              ? "stake weight moved between routing pools. allocation follows trust; nothing was unlocked."
+              : "burn is not scheduled. it happens when compute happens — a share of execution fees buys $Q0R and retires it."}
         </p>
       </BlockSection>
     </>
@@ -224,7 +272,7 @@ export default function Console() {
   }, []);
   const meshProgress = useRef({ opacity: 1, form: 1 });
   const snap = useFeed();
-  const [selected, setSelected] = useState<FeedItem | null>(null);
+  const [selected, setSelected] = useState<Sel | null>(null);
   const [meshSelected, setMeshSelected] = useState(-1);
 
   useEffect(() => bindPointer(), []);
@@ -239,41 +287,42 @@ export default function Console() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const jobs = snap.items.filter((i): i is JobItem => i.kind === "job");
+  // distinct job entities currently visible in the event window
+  const jobs = useMemo(() => {
+    const seen = new Set<string>();
+    const out: JobEntity[] = [];
+    for (const i of snap.items) {
+      if (i.kind === "job" && !seen.has(i.entity.id)) {
+        seen.add(i.entity.id);
+        out.push(i.entity);
+      }
+    }
+    return out;
+  }, [snap.items]);
 
   const pickNodeByName = (name: string) => {
     const w = snap.workers.find((w) => w.node === name);
-    if (w) setSelected(w);
+    if (w) setSelected({ id: `wn-${name}`, title: `NODE ${name}`, t: "worker", w });
   };
 
   const pickMeshNode = (idx: number) => {
     setMeshSelected(idx);
     const n = network.nodes[idx];
-    // present the mesh node as a worker block
-    const w: WorkerItem = {
-      kind: "worker",
-      id: `mesh-${n.id}`,
-      block: 918_000 + idx,
+    const load = Math.round(n.utilization * 100);
+    const w: WorkerEntity = {
       node: n.id,
       region: n.region,
-      gpu: `${n.gpuClass}`,
+      gpu: n.gpuClass,
       status: n.reliability > 0.975 ? "online" : n.utilization > 0.9 ? "throttling" : "unstable",
-      loadLo: Math.max(10, Math.round(n.utilization * 100) - 14),
-      loadHi: Math.min(99, Math.round(n.utilization * 100) + 12),
-      loadNow: Math.round(n.utilization * 100),
+      loadHist: [Math.max(8, load - 9), Math.min(98, load + 5), load],
+      stressed: n.reliability <= 0.975,
       note: n.reliability <= 0.975 ? "reliability degraded" : undefined,
       earningsEpoch: n.earnings,
+      failMemory: n.reliability <= 0.97 ? 2 : 0,
       recent: [],
-      updatedTick: snap.tick,
     };
-    setSelected(w);
+    setSelected({ id: `mesh-${n.id}`, title: `NODE ${n.id}`, t: "worker", w });
   };
-
-  const drawerTitle = selected
-    ? selected.kind === "token"
-      ? `EVENT #${selected.block.toLocaleString("en-US")}`
-      : `BLOCK #${selected.block.toLocaleString("en-US")}`
-    : "";
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-bg">
@@ -303,7 +352,13 @@ export default function Console() {
           selected={meshSelected}
         />
         <EffectComposer>
-          <Bloom mipmapBlur intensity={1.05} luminanceThreshold={0.16} luminanceSmoothing={0.3} radius={0.85} />
+          <Bloom
+            mipmapBlur
+            intensity={1.05}
+            luminanceThreshold={0.16}
+            luminanceSmoothing={0.3}
+            radius={0.85}
+          />
           <Vignette darkness={0.78} offset={0.24} />
         </EffectComposer>
       </Canvas>
@@ -336,55 +391,53 @@ export default function Console() {
 
       {/* live feed — primary UI */}
       <div className="absolute max-md:inset-x-3 max-md:bottom-3 max-md:h-[42vh] md:bottom-6 md:left-6 md:top-24 md:w-[390px]">
-      <div className="glass reticle flex h-full flex-col overflow-hidden">
-        <div className="flex items-center justify-between border-b border-line px-4 py-3">
-          <span className="col-heading">live feed</span>
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-mute">
-            in flight {fmtTildeRange(snap.approx.jobsInFlightLo, snap.approx.jobsInFlightHi)}
-          </span>
+        <div className="glass reticle flex h-full flex-col overflow-hidden">
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
+            <span className="col-heading">live feed</span>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-mute">
+              in flight {fmtTildeRange(snap.approx.jobsInFlightLo, snap.approx.jobsInFlightHi)}
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto px-1.5 py-1.5">
+            <AnimatePresence initial={false}>
+              {snap.items.map((i) => {
+                const s = itemStatusLabel(i);
+                const active = selected?.id === i.id;
+                const dot =
+                  i.kind === "job" ? "bg-signal" : i.kind === "worker" ? "bg-violet" : "bg-cyan";
+                return (
+                  <motion.button
+                    key={i.id}
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.35, ease: [0.7, 0, 0.3, 1] }}
+                    onClick={() => {
+                      setSelected(selFromItem(i));
+                      setMeshSelected(-1);
+                    }}
+                    aria-pressed={active}
+                    className={`grid w-full grid-cols-[8px_1fr_auto] items-baseline gap-x-2.5 rounded-[6px] px-2.5 py-[6px] text-left transition-colors duration-150 ${
+                      active ? "bg-[rgba(91,124,255,0.08)]" : "hover:bg-[rgba(235,240,255,0.03)]"
+                    }`}
+                  >
+                    <span className={`h-1.5 w-1.5 self-center rounded-full ${dot}`} aria-hidden />
+                    <span className="truncate font-mono text-[12px] text-ink">{itemTitle(i)}</span>
+                    <span className={`font-mono text-[10.5px] ${s.cls}`}>{s.label}</span>
+                    <span aria-hidden />
+                    <span className="col-span-2 truncate font-mono text-[10.5px] text-mute">
+                      {itemDetail(i)}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+          <div className="flex items-center justify-between border-t border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-mute">
+            <span>providers {snap.approx.providersMasked}</span>
+            <span>latency {fmtRangeMs(snap.approx.latencyLo, snap.approx.latencyHi)} · varies</span>
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto px-1.5 py-1.5">
-          <AnimatePresence initial={false}>
-            {snap.items.map((i) => {
-              const s = itemStatusLabel(i);
-              const active = selected?.id === i.id;
-              const dot =
-                i.kind === "job" ? "bg-signal" : i.kind === "worker" ? "bg-violet" : "bg-cyan";
-              return (
-                <motion.button
-                  key={i.id}
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35, ease: [0.7, 0, 0.3, 1] }}
-                  onClick={() => {
-                    setSelected(i);
-                    setMeshSelected(-1);
-                  }}
-                  aria-pressed={active}
-                  className={`grid w-full grid-cols-[8px_1fr_auto] items-baseline gap-x-2.5 rounded-[6px] px-2.5 py-[6px] text-left transition-colors duration-150 ${
-                    active ? "bg-[rgba(91,124,255,0.08)]" : "hover:bg-[rgba(235,240,255,0.03)]"
-                  }`}
-                >
-                  <span className={`h-1.5 w-1.5 self-center rounded-full ${dot}`} aria-hidden />
-                  <span className="truncate font-mono text-[12px] text-ink">{itemTitle(i)}</span>
-                  <span className={`font-mono text-[10.5px] ${s.cls}`}>{s.label}</span>
-                  <span aria-hidden />
-                  <span className="col-span-2 truncate font-mono text-[10.5px] text-mute">
-                    {itemDetail(i)}
-                  </span>
-                </motion.button>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-        <div className="flex items-center justify-between border-t border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-mute">
-          <span>providers {snap.approx.providersMasked}</span>
-          <span>
-            latency {fmtRangeMs(snap.approx.latencyLo, snap.approx.latencyHi)} · varies
-          </span>
-        </div>
-      </div>
       </div>
 
       {/* network state (approx) — quiet corner panel, yields to the drawer */}
@@ -435,36 +488,42 @@ export default function Console() {
             exit={{ x: "105%" }}
             transition={{ duration: 0.45, ease: [0.7, 0, 0.3, 1] }}
             role="dialog"
-            aria-label={drawerTitle}
+            aria-label={selected.title}
             className="absolute z-10 max-md:inset-x-3 max-md:bottom-3 max-md:top-[22vh] md:bottom-6 md:right-6 md:top-24 md:w-[420px]"
           >
-          <div className="glass reticle flex h-full flex-col overflow-hidden">
-            <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-              <span className="font-mono text-[13px] font-medium tracking-[0.04em] text-ink">
-                {drawerTitle}
-              </span>
-              <button
-                onClick={() => {
-                  setSelected(null);
-                  setMeshSelected(-1);
-                }}
-                className="font-mono text-[14px] text-mute hover:text-ink"
-                aria-label="Close explorer"
-              >
-                ×
-              </button>
+            <div className="glass reticle flex h-full flex-col overflow-hidden">
+              <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+                <span className="font-mono text-[13px] font-medium tracking-[0.04em] text-ink">
+                  {selected.title}
+                </span>
+                <button
+                  onClick={() => {
+                    setSelected(null);
+                    setMeshSelected(-1);
+                  }}
+                  className="font-mono text-[14px] text-mute hover:text-ink"
+                  aria-label="Close explorer"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto pb-2">
+                {selected.t === "job" && <JobBlock j={selected.j} onPickNode={pickNodeByName} />}
+                {selected.t === "worker" && (
+                  <WorkerBlock
+                    w={selected.w}
+                    jobs={jobs}
+                    onPickJob={(j) =>
+                      setSelected({ id: `je-${j.id}`, title: `JOB ${j.hash}`, t: "job", j })
+                    }
+                  />
+                )}
+                {selected.t === "eco" && <EcoBlock e={selected.e} />}
+              </div>
+              <div className="border-t border-line px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mute">
+                snapshot · locally true, globally incomplete
+              </div>
             </div>
-            <div className="flex-1 overflow-y-auto pb-2">
-              {selected.kind === "job" && <JobBlock j={selected} onPick={pickNodeByName} />}
-              {selected.kind === "worker" && (
-                <WorkerBlock w={selected} jobs={jobs} onPickJob={(j) => setSelected(j)} />
-              )}
-              {selected.kind === "token" && <TokenBlock t={selected} />}
-            </div>
-            <div className="border-t border-line px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mute">
-              snapshot · updates live in feed
-            </div>
-          </div>
           </motion.aside>
         )}
       </AnimatePresence>
