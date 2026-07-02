@@ -2,11 +2,11 @@
 
 import Reveal from "@/components/ui/Reveal";
 import Scramble from "@/components/ui/Scramble";
-import { useFeed } from "@/lib/useFeed";
 
 /**
- * Not a tokenomics page — a live settlement and staking system being
- * observed. State first, behavior second, one idea at the end.
+ * Not a tokenomics page — the staking model stated plainly. No simulated
+ * totals or observed counters; protocol activity belongs in the explorer.
+ * Model first, behavior second, one idea at the end.
  */
 
 function StateRow({
@@ -39,9 +39,6 @@ const SPLITS = [
 ];
 
 export default function Token() {
-  const snap = useFeed();
-  const a = snap.approx;
-
   return (
     <section className="hairline-t relative py-[clamp(110px,14vh,170px)]" id="token">
       <div
@@ -68,69 +65,51 @@ export default function Token() {
         </Reveal>
 
         <div className="mt-16 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-          {/* live system state */}
+          {/* staking model — no simulated totals */}
           <Reveal>
             <div className="glass reticle p-6">
               <div className="mb-4 flex items-center justify-between">
-                <span className="col-heading">live system state</span>
-                <span className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
-                  <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-pos" aria-hidden />
-                  epoch {snap.epoch.toLocaleString()}
+                <span className="col-heading">staking model</span>
+                <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
+                  self-custody
                 </span>
               </div>
               <StateRow
-                label="$Q0R staked"
-                value="~14m–15m"
-                note="shifting across routing pools"
+                label="custody"
+                value="your wallet"
+                note="stake weight is read, never held"
               />
               <StateRow
-                label="protocol revenue (epoch)"
-                value="streaming"
-                note="batch value: high (unfinalized)"
+                label="what stake does"
+                value="routing weight"
+                note="trust between machines"
               />
               <StateRow
-                label="burn activity"
-                value={
-                  a.lastBurn?.amount ? `${a.lastBurn.amount.toLocaleString()} Q0R` : "updating"
-                }
-                note={a.lastBurn ? `last batch · ${a.lastBurn.state}` : "per execution batch"}
-                cls="text-cyan"
+                label="rewards"
+                value="USDC"
+                note="a share of execution fees, per epoch"
               />
-              <StateRow label="staker rewards" value="distributing" note="USDC · per epoch" />
               <StateRow
-                label="buyback flow"
-                value={
-                  a.lastBuyback?.amount
-                    ? `${a.lastBuyback.amount.toLocaleString()} Q0R`
-                    : "queued"
-                }
-                note={a.lastBuyback ? `open market · ${a.lastBuyback.state}` : "awaiting batch"}
+                label="burn"
+                value="per execution batch"
+                note="buyback + burn from fees"
                 cls="text-cyan"
               />
               <StateRow
-                label="slashing events"
-                value={`${a.slashesEpoch} observed`}
-                note="failed or invalid execution"
+                label="slashing"
+                value="on invalid execution"
+                note="stake and routing weight down"
                 cls="text-neg"
               />
-              <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-5">
-                <div>
-                  <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
-                    $Q0R burned · rolling
-                  </p>
-                  <p className="tnum mt-1 font-display text-[22px] font-semibold text-ink">~8m+</p>
-                  <p className="font-mono text-[10px] text-mute">partial visibility</p>
-                </div>
-                <div>
-                  <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
-                    pending settlement
-                  </p>
-                  <p className="tnum mt-1 font-display text-[22px] font-semibold text-mute">
-                    queued
-                  </p>
-                  <p className="font-mono text-[10px] text-mute">finalizing next epoch window</p>
-                </div>
-              </div>
+              <StateRow
+                label="unstaking"
+                value="anytime"
+                note="influence ends when stake ends"
+              />
+              <p className="mt-6 border-t border-line pt-5 font-mono text-[11.5px] leading-[1.8] text-mute">
+                live staking and settlement activity is on-chain and visible in
+                the explorer — this page describes the model, not the moment.
+              </p>
             </div>
           </Reveal>
 

@@ -17,7 +17,7 @@ export default function CtaBand() {
       <div className="container-x relative flex flex-col items-center py-[clamp(130px,18vh,210px)] text-center">
         <Reveal>
           <p className="chip mb-7">
-            <Scramble text="THE MESH IS LIVE" />
+            <Scramble text="READY WHEN YOU ARE" />
           </p>
         </Reveal>
         <Reveal delay={0.1}>

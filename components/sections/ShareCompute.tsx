@@ -1,12 +1,11 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import Reveal from "@/components/ui/Reveal";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 /**
  * The provider side of the network: three steps from idle GPU to income,
- * next to a worker session that loops the way a real one would run.
+ * next to the actual commands a worker runs. No simulated session logs
+ * or invented earnings — honest capability over simulated scale.
  */
 
 const STEPS = [
@@ -27,72 +26,37 @@ const STEPS = [
   },
 ];
 
-const SESSION: Array<[cls: string, text: string]> = [
-  ["text-dim", "$ q0r worker start"],
-  ["text-pos", "✓ hardware detected · 2× RTX 5090"],
-  ["text-pos", "✓ environment attested"],
-  ["text-pos", "✓ joined mesh · eu-central · 34ms"],
-  ["text-dim", "→ job 0x8f31 accepted · inference"],
-  ["text-dim", "  executing … verified ✓"],
-  ["text-cyan", "+ 2.41 USDC · epoch 1,284"],
-  ["text-dim", "→ job 0xa412 accepted · rendering"],
-  ["text-dim", "  executing … verified ✓"],
-  ["text-cyan", "+ 5.87 USDC · epoch 1,284"],
-  ["text-mute", "  uptime ~99% · trust rising"],
+// the actual provider path, as commands — not a simulated session
+const COMMANDS: Array<{ cmt: string; cmd: string }> = [
+  { cmt: "# install the worker — benchmarks + attests your hardware", cmd: "curl -sL get.q0r.network | sh" },
+  { cmt: "# connect the wallet your rewards settle to", cmd: "q0r wallet connect" },
+  { cmt: "# join the mesh and start accepting jobs", cmd: "q0r worker start" },
 ];
 
-function WorkerSession() {
-  const [printed, setPrinted] = useState(0);
-  const el = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const node = el.current;
-    if (!node) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPrinted(SESSION.length);
-      return;
-    }
-    let timer: ReturnType<typeof setInterval> | null = null;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !timer) {
-          timer = setInterval(() => {
-            setPrinted((p) => (p >= SESSION.length ? (p > SESSION.length + 4 ? 0 : p + 1) : p + 1));
-          }, 420);
-        } else if (!entries[0].isIntersecting && timer) {
-          clearInterval(timer);
-          timer = null;
-        }
-      },
-      { rootMargin: "0px 0px -10% 0px" },
-    );
-    io.observe(node);
-    return () => {
-      io.disconnect();
-      if (timer) clearInterval(timer);
-    };
-  }, []);
-
+function WorkerSetup() {
   return (
-    <div ref={el} className="glass reticle overflow-hidden">
+    <div className="glass reticle overflow-hidden">
       <div className="flex items-center justify-between border-b border-line px-5 py-3">
-        <span className="col-heading">Worker session</span>
-        <span className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
-          <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-pos" aria-hidden />
-          nd-4c1a · online
+        <span className="col-heading">Worker setup</span>
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
+          three commands
         </span>
       </div>
-      <div className="min-h-[320px] p-6 font-mono text-[13px] leading-[2]">
-        {SESSION.slice(0, printed).map(([cls, text], i) => (
-          <div key={i} className={cls}>
-            {text}
+      <div className="flex min-h-[280px] flex-col justify-center gap-6 p-6 font-mono text-[13px] leading-[1.8]">
+        {COMMANDS.map((c) => (
+          <div key={c.cmd}>
+            <p className="text-mute">{c.cmt}</p>
+            <p className="mt-1 text-dim">
+              <span className="text-signal">$</span> {c.cmd}
+            </p>
           </div>
         ))}
-        <span className="mt-1 inline-block h-[15px] w-[8px] animate-pulse-dot bg-signal" aria-hidden />
       </div>
       <div className="flex items-center justify-between border-t border-line px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mute">
-        <span>session earnings</span>
-        <span className="tnum text-cyan">8.28 USDC</span>
+        <span>paid per verified output · settled in USDC</span>
+        <Link href="/supply" className="text-signal transition-colors hover:text-signal-bright">
+          the full path →
+        </Link>
       </div>
     </div>
   );
@@ -143,7 +107,7 @@ export default function ShareCompute() {
             ))}
           </div>
           <Reveal delay={0.15}>
-            <WorkerSession />
+            <WorkerSetup />
           </Reveal>
         </div>
       </div>

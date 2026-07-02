@@ -266,7 +266,7 @@ export default function Developers() {
               an API<span className="text-signal">.</span>
             </>
           }
-          body="Everything the console can do, the protocol exposes. Telemetry is free to read; execution is a signed request away."
+          body="Everything the explorer shows, the protocol exposes. State is free to read; execution is a signed request away."
         />
 
         <div className="container-x mt-20 grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
@@ -344,10 +344,7 @@ export default function Developers() {
               {/* status bar */}
               <div className="flex items-center justify-between border-t border-line px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mute">
                 <span>api.q0r.network</span>
-                <span className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-pos" aria-hidden />
-                  200 · 38ms
-                </span>
+                <span>reference examples</span>
               </div>
             </div>
           </Reveal>
