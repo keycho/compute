@@ -5,7 +5,6 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { viewState } from "@/lib/viewState";
-import Crystal from "./Crystal";
 import Dither from "./Dither";
 import Particles, { type ParticleUniforms } from "./Particles";
 import NetworkMesh from "./NetworkMesh";
@@ -13,10 +12,12 @@ import NetworkMesh from "./NetworkMesh";
 /**
  * The single connective canvas behind the whole journey.
  *
- * Scroll progress hands scenes to each other:
- *   0.00–0.14  core crystal idles (hero)
- *   0.10–0.26  shatter — shards fly outward, mesh forms out of them
- *   0.26–0.60  camera pushes into the living mesh (protocol/network state)
+ * The formation IS the product: a constellation of worker nodes joined
+ * by routes, with job packets moving between them — no abstract rock,
+ * no dust cloud. It assembles once on arrival and slowly rotates.
+ *
+ * Scroll progress:
+ *   0.00–0.60  constellation idles right of the copy; camera pushes in
  *   0.60–0.82  particles align into vertical data streams (developers)
  *   0.82–1.00  everything dims toward the void (cta/footer)
  */
@@ -28,38 +29,33 @@ const smooth = (a: number, b: number, x: number) => {
 
 function Rig({
   particleUniforms,
-  crystalProgress,
   meshProgress,
 }: {
   particleUniforms: React.MutableRefObject<ParticleUniforms | null>;
-  crystalProgress: React.MutableRefObject<{ shatter: number; opacity: number }>;
   meshProgress: React.MutableRefObject<{ opacity: number; form: number }>;
 }) {
   const { camera } = useThree();
-  const look = useRef(new THREE.Vector3(0, 0, -3));
+  const look = useRef(new THREE.Vector3(1.1, 0, -3));
 
-  useFrame(() => {
+  useFrame((state) => {
     const p = viewState.scroll;
     const reduced = viewState.reducedMotion;
+    const t = state.clock.elapsedTime;
 
-    const shatter = smooth(0.1, 0.26, p);
     const dim = 1 - smooth(0.76, 0.93, p) * 0.88;
 
-    crystalProgress.current.shatter = shatter;
-    crystalProgress.current.opacity = (1 - smooth(0.16, 0.28, p)) * dim;
-
-    meshProgress.current.form = smooth(0.14, 0.34, p);
-    meshProgress.current.opacity =
-      smooth(0.14, 0.3, p) * (1 - smooth(0.62, 0.8, p) * 0.85) * dim * 0.85;
+    // assemble once on arrival, then hold; fade for the streams finale
+    meshProgress.current.form = reduced ? 1 : smooth(0.15, 1.7, t);
+    meshProgress.current.opacity = (1 - smooth(0.62, 0.8, p) * 0.85) * dim;
 
     const u = particleUniforms.current;
     if (u) {
-      u.uHalo.value = 1 - smooth(0.12, 0.3, p);
+      u.uHalo.value = 0; // ambient dust only — no orbiting shell
       u.uStream.value = smooth(0.58, 0.74, p) * (1 - smooth(0.8, 0.92, p));
       u.uDim.value = dim;
     }
 
-    // camera: dolly in through the mesh, drift down toward the streams
+    // camera: dolly in through the constellation, drift down to streams
     const push = smooth(0.28, 0.6, p);
     const sink = smooth(0.6, 0.84, p);
     const targetZ = 10 - push * 3.4 + sink * 1.2;
@@ -72,11 +68,7 @@ function Rig({
     camera.position.y += (targetY + py - camera.position.y) * 0.045;
     camera.position.z += (targetZ - camera.position.z) * 0.06;
 
-    look.current.set(
-      (1 - shatter) * 1.1,
-      targetY * 0.6,
-      -3,
-    );
+    look.current.set(1.1, targetY * 0.6, -3);
     camera.lookAt(look.current);
   });
 
@@ -85,7 +77,6 @@ function Rig({
 
 export default function Scene() {
   const particleUniforms = useRef<ParticleUniforms | null>(null);
-  const crystalProgress = useRef({ shatter: 0, opacity: 1 });
   const meshProgress = useRef({ opacity: 0, form: 0 });
 
   return (
@@ -102,16 +93,11 @@ export default function Scene() {
         }}
       >
         <Suspense fallback={null}>
-          <Rig
-            particleUniforms={particleUniforms}
-            crystalProgress={crystalProgress}
-            meshProgress={meshProgress}
-          />
-          {/* shifted right + up so the formation clears the hero copy
-              and action cards on the left */}
-          <group position={[1.9, 0.45, 0]}>
-            <Crystal progressRef={crystalProgress} />
-            <NetworkMesh progressRef={meshProgress} />
+          <Rig particleUniforms={particleUniforms} meshProgress={meshProgress} />
+          {/* shifted right + up so the constellation clears the hero
+              copy and action cards on the left */}
+          <group position={[2.2, 0.5, 0]}>
+            <NetworkMesh progressRef={meshProgress} scale={6.5} rotationSpeed={0.02} />
             <Particles uniformsRef={particleUniforms} />
           </group>
           <EffectComposer>

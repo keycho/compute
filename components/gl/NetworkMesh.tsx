@@ -21,7 +21,8 @@ const packetVertex = /* glsl */ `
     vColor = aColor;
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mv;
-    gl_PointSize = aSize * (170.0 / -mv.z);
+    // small clamped points: packets are crisp dots, not glowing orbs
+    gl_PointSize = clamp(aSize * (80.0 / -mv.z), 1.0, 6.0);
   }
 `;
 
@@ -30,7 +31,7 @@ const packetFragment = /* glsl */ `
   varying vec3 vColor;
   void main() {
     float d = length(gl_PointCoord - 0.5);
-    float a = smoothstep(0.5, 0.06, d) * uOpacity;
+    float a = smoothstep(0.5, 0.34, d) * uOpacity;
     gl_FragColor = vec4(vColor * 1.7, a);
   }
 `;
