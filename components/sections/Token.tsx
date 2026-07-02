@@ -1,43 +1,47 @@
 "use client";
 
-import CountUp from "@/components/ui/CountUp";
 import Reveal from "@/components/ui/Reveal";
-import SectionHeader from "@/components/ui/SectionHeader";
-import { useProtocol } from "@/lib/useProtocol";
-import { fmtCompact } from "@/lib/format";
+import Scramble from "@/components/ui/Scramble";
+import { useFeed } from "@/lib/useFeed";
+import { fmtCompact, fmtTilde } from "@/lib/format";
 
 /**
- * Protocol economics — deliberately placed after the product story.
- * The flow diagram reads top to bottom: applications pay for compute,
- * the protocol captures a fee, value routes to the treasury, stakers,
- * and providers.
+ * Not a tokenomics page — a live settlement and staking system being
+ * observed. State first, behavior second, one idea at the end.
  */
 
-const FLOWS = [
-  {
-    title: "Applications pay for completed compute",
-    body: "Jobs are priced per verified unit of work. Nothing is charged for failed or unverifiable execution.",
-  },
-  {
-    title: "The protocol captures execution fees",
-    body: "A fixed percentage of every settled job accrues to the protocol as revenue.",
-  },
-  {
-    title: "Revenue flows into the treasury",
-    body: "The treasury funds audits, client development, and provider incentives — governed on-chain.",
-  },
-  {
-    title: "Stakers secure routing and earn rewards",
-    body: "Q0R staked on providers backs their reliability. Honest operation earns protocol rewards; failed verification is slashed.",
-  },
-  {
-    title: "Providers receive execution rewards",
-    body: "The bulk of every payment goes to the hardware that did the work, settled in USDC each epoch.",
-  },
+function StateRow({
+  label,
+  value,
+  note,
+  cls,
+}: {
+  label: string;
+  value: React.ReactNode;
+  note?: string;
+  cls?: string;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-b border-line py-4 first:border-t">
+      <span className="font-mono text-[13px] text-mute">{label}</span>
+      <span className="text-right">
+        <span className={`tnum font-mono text-[15px] ${cls ?? "text-ink"}`}>{value}</span>
+        {note && <span className="ml-2 font-mono text-[11px] text-mute">{note}</span>}
+      </span>
+    </div>
+  );
+}
+
+const SPLITS = [
+  { label: "provider payouts", note: "per verified output" },
+  { label: "staker rewards", note: "USDC · per epoch" },
+  { label: "protocol reserve", note: "governed on-chain" },
+  { label: "$Q0R buyback + burn", note: "per execution batch" },
 ];
 
 export default function Token() {
-  const snap = useProtocol();
+  const snap = useFeed();
+  const a = snap.approx;
 
   return (
     <section className="hairline-t relative py-[clamp(110px,14vh,170px)]" id="token">
@@ -49,99 +53,148 @@ export default function Token() {
             "linear-gradient(to bottom, rgba(3,3,4,0.64), rgba(3,3,4,0.44) 50%, rgba(3,3,4,0.68))",
         }}
       />
-      <div className="relative">
-        <SectionHeader
-          chip="Q0R TOKEN"
-          title={
-            <>
-              Economics that
-              <br />
-              follow the work<span className="text-signal">.</span>
-            </>
-          }
-          body="Value in the protocol moves the same direction as compute: from the applications that consume it to the people who supply it."
-        />
+      <div className="container-x relative">
+        <Reveal>
+          <p className="chip mb-6">
+            <Scramble text="Q0R TOKEN" />
+          </p>
+          <h2 className="display text-[clamp(2.2rem,4.2vw,3.6rem)]">
+            Stake $Q0R<span className="text-signal">.</span> Self-custody
+            <span className="text-signal">.</span>
+          </h2>
+          <p className="mt-6 max-w-[520px] font-mono text-[14.5px] leading-[1.8] text-dim">
+            Your Q0R stays in your wallet. Only stake weight is read by the
+            network.
+          </p>
+        </Reveal>
 
-        <div className="container-x mt-16 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-          <div className="flex flex-col">
-            {FLOWS.map((f, i) => (
-              <Reveal key={f.title} delay={i * 0.06}>
-                <div className="group border-b border-line py-6 first:border-t">
-                  <div className="flex items-baseline gap-4">
-                    <span className="font-mono text-[11px] text-signal" aria-hidden>
-                      {i === 0 ? "●" : "↓"}
-                    </span>
-                    <div>
-                      <h3 className="font-display text-[17px] font-semibold tracking-[-0.01em] text-ink">
-                        {f.title}
-                      </h3>
-                      <p className="mt-2 max-w-[520px] font-mono text-[13px] leading-[1.7] text-mute">
-                        {f.body}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={0.15}>
-            <div className="glass reticle flex h-full flex-col p-7">
-              <span className="col-heading mb-8">This epoch · live</span>
-              <div className="flex flex-1 flex-col justify-between gap-7">
+        <div className="mt-16 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+          {/* live system state */}
+          <Reveal>
+            <div className="glass reticle p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="col-heading">live system state</span>
+                <span className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
+                  <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-pos" aria-hidden />
+                  epoch {snap.epoch.toLocaleString()}
+                </span>
+              </div>
+              <StateRow
+                label="$Q0R staked"
+                value={`${a.stakedM.toFixed(1)}m`}
+                note="fluctuating across routing pools"
+              />
+              <StateRow
+                label="protocol revenue (epoch)"
+                value={fmtCompact(a.revenueEpoch)}
+                note="from completed jobs"
+              />
+              <StateRow
+                label="burn activity"
+                value={
+                  a.lastBurn
+                    ? `${a.lastBurn.amount.toLocaleString()} Q0R`
+                    : "updating"
+                }
+                note={a.lastBurn ? `last batch · ${a.lastBurn.state}` : "per execution batch"}
+                cls="text-cyan"
+              />
+              <StateRow
+                label="staker rewards"
+                value={fmtCompact(a.rewardsPaidEpoch * 0.06)}
+                note="USDC · distributing"
+              />
+              <StateRow
+                label="slashing events"
+                value={a.slashesEpoch}
+                note="failed or invalid execution"
+                cls="text-neg"
+              />
+              <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-5">
                 <div>
-                  <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint">
-                    Execution settled
+                  <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
+                    $Q0R burned · rolling
                   </p>
-                  <CountUp
-                    value={snap.epochRewards * 9}
-                    format={(v) => fmtCompact(v)}
-                    className="font-display text-[34px] font-semibold text-ink"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint">
-                      Provider rewards
-                    </p>
-                    <CountUp
-                      value={snap.epochRewards * 9 * 0.85}
-                      format={(v) => fmtCompact(v)}
-                      className="font-display text-[22px] font-semibold text-cyan"
-                    />
-                    <p className="mt-0.5 font-mono text-[10px] text-mute">85% · USDC</p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint">
-                      Protocol fee
-                    </p>
-                    <CountUp
-                      value={snap.epochRewards * 9 * 0.15}
-                      format={(v) => fmtCompact(v)}
-                      className="font-display text-[22px] font-semibold text-signal-bright"
-                    />
-                    <p className="mt-0.5 font-mono text-[10px] text-mute">15% · treasury + stakers</p>
-                  </div>
+                  <p className="tnum mt-1 font-display text-[22px] font-semibold text-ink">
+                    {fmtTilde(a.burnedTotal).replace("~", "~")}
+                  </p>
                 </div>
                 <div>
-                  <div className="mb-2 flex justify-between font-mono text-[10.5px] uppercase tracking-[0.12em]">
-                    <span className="text-faint">Fee split</span>
-                    <span className="text-mute">treasury 60 / stakers 40</span>
-                  </div>
-                  <div className="flex h-[6px] overflow-hidden rounded-full">
-                    <span className="w-[60%] bg-[rgba(91,124,255,0.55)]" />
-                    <span className="w-[40%] bg-[rgba(139,92,246,0.55)]" />
-                  </div>
+                  <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-mute">
+                    pending settlement
+                  </p>
+                  <p className="tnum mt-1 font-display text-[22px] font-semibold text-mute">
+                    {fmtCompact(a.pendingSettlement)}
+                  </p>
+                  <p className="font-mono text-[10px] text-mute">finalizing next epoch window</p>
                 </div>
-                <p className="border-t border-line pt-5 font-mono text-[12px] leading-[1.7] text-mute">
-                  Applications never hold Q0R to use the network — jobs are paid
-                  in stable value. The token secures routing and governs the
-                  treasury.
+              </div>
+            </div>
+          </Reveal>
+
+          {/* behavior */}
+          <Reveal delay={0.1}>
+            <div className="flex h-full flex-col justify-between gap-10">
+              <div>
+                <p className="col-heading mb-4">stake behavior</p>
+                <p className="font-mono text-[14px] leading-[1.8] text-dim">
+                  staking does not unlock features. it changes routing weight.
+                </p>
+                <p className="mt-3 font-mono text-[14px] leading-[1.8] text-ink">
+                  higher stake → higher trust score → more job allocation.
+                </p>
+                <p className="mt-3 font-mono text-[13px] leading-[1.8] text-mute">
+                  unstaked tokens have no routing influence.
+                </p>
+              </div>
+
+              <div>
+                <p className="col-heading mb-4">value flow</p>
+                <p className="mb-4 font-mono text-[13px] leading-[1.7] text-dim">
+                  compute jobs generate USDC revenue. it splits continuously into:
+                </p>
+                <ul className="flex flex-col">
+                  {SPLITS.map((s) => (
+                    <li
+                      key={s.label}
+                      className="flex items-baseline justify-between border-b border-line py-3 font-mono text-[13px] first:border-t"
+                    >
+                      <span className="text-ink">{s.label}</span>
+                      <span className="text-[11px] text-mute">{s.note}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-4 font-mono text-[13px] leading-[1.8] text-dim">
+                  burn is not scheduled.{" "}
+                  <span className="text-ink">it happens when compute happens.</span>
+                </p>
+              </div>
+
+              <div>
+                <p className="col-heading mb-4">slashing</p>
+                <p className="font-mono text-[13px] leading-[1.8] text-mute">
+                  invalid execution reduces trust: stake reduction, routing
+                  weight decrease, possible exclusion from the job pool.{" "}
+                  <span className="text-dim">failure is part of system behavior.</span>
                 </p>
               </div>
             </div>
           </Reveal>
         </div>
+
+        {/* core idea */}
+        <Reveal delay={0.15}>
+          <div className="mx-auto mt-20 max-w-[640px] border-t border-line pt-10 text-center">
+            <p className="font-mono text-[14px] leading-[1.9] text-dim">
+              Q0R is not a utility token. it is a coordination signal for
+              compute execution.
+            </p>
+            <p className="mt-3 font-mono text-[14px] leading-[1.9] text-ink">
+              the network runs regardless. the token enforces trust between
+              machines that do not know each other.
+            </p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

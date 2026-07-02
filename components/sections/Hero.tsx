@@ -2,9 +2,8 @@
 
 import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
-import CountUp from "@/components/ui/CountUp";
 import Scramble from "@/components/ui/Scramble";
-import { useProtocol } from "@/lib/useProtocol";
+import { useFeed } from "@/lib/useFeed";
 import Telemetry from "./Telemetry";
 
 const ease = [0.7, 0, 0.3, 1] as const;
@@ -19,7 +18,7 @@ const enter = (delay: number) => ({
 });
 
 export default function Hero() {
-  const snap = useProtocol();
+  const snap = useFeed();
 
   return (
     <section className="relative flex min-h-svh items-center pt-16" id="top">
@@ -73,28 +72,20 @@ export default function Hero() {
             className="mt-14 flex flex-wrap gap-x-10 gap-y-4 font-mono text-[11px] uppercase tracking-[0.13em] text-mute"
           >
             <span>
-              <CountUp
-                value={snap.providers}
-                format={(v) => Math.round(v).toLocaleString("en-US")}
-                className="text-ink"
-              />{" "}
-              active providers
+              <span className="tnum text-ink">{snap.approx.providersMasked}</span> active
+              providers
             </span>
             <span>
-              <CountUp
-                value={snap.jobsExecuted}
-                format={(v) => `${(v / 1e6).toFixed(1)}M`}
-                className="text-ink"
-              />{" "}
-              jobs executed
+              <span className="tnum text-ink">
+                ~{Math.round(snap.approx.jobsInFlight / 1000)}k
+              </span>{" "}
+              jobs in flight
             </span>
             <span>
-              <CountUp
-                value={snap.availablePflops}
-                format={(v) => `${Math.round(v)} PFLOPS`}
-                className="text-ink"
-              />{" "}
-              available
+              <span className="tnum text-ink">
+                {Math.round(snap.approx.latencyLo)}–{Math.round(snap.approx.latencyHi)}ms
+              </span>{" "}
+              latency · varies
             </span>
           </motion.div>
         </div>

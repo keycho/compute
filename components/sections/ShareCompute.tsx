@@ -38,7 +38,7 @@ const SESSION: Array<[cls: string, text: string]> = [
   ["text-dim", "→ job 0xa412 accepted · rendering"],
   ["text-dim", "  executing … verified ✓"],
   ["text-cyan", "+ 5.87 USDC · epoch 1,284"],
-  ["text-mute", "  uptime 99.4% · rank rising"],
+  ["text-mute", "  uptime ~99% · trust rising"],
 ];
 
 function WorkerSession() {

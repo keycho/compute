@@ -1,44 +1,33 @@
 "use client";
 
-import { useProtocol } from "@/lib/useProtocol";
-import { fmtLatency } from "@/lib/format";
+import { useFeed } from "@/lib/useFeed";
+import { itemStatusLabel, itemTitle } from "@/components/ui/feedFormat";
 
 /**
- * Full-bleed telemetry tape. Content is doubled for a seamless CSS
- * marquee; hovering pauses the belt so figures can be read.
+ * Event tape: the last stretch of the feed scrolling by. Doubled for a
+ * seamless marquee; hover pauses it.
  */
 export default function Ticker() {
-  const snap = useProtocol();
+  const snap = useFeed();
 
-  const classItems = snap.classes.map((c) => (
-    <span key={c.key} className="mx-7 inline-flex items-baseline gap-3 font-mono text-[12px]">
-      <span className="font-medium tracking-[0.04em] text-ink">{c.key}</span>
-      <span className="tnum text-dim">{c.available.toLocaleString("en-US")} free</span>
-      <span className={`tnum ${c.utilization > 0.9 ? "text-neg" : "text-pos"}`}>
-        {(c.utilization * 100).toFixed(1)}%
+  const items = snap.items.slice(0, 14).map((i) => {
+    const s = itemStatusLabel(i);
+    return (
+      <span key={i.id} className="mx-7 inline-flex items-baseline gap-3 font-mono text-[12px]">
+        <span className="tracking-[0.02em] text-dim">{itemTitle(i)}</span>
+        <span className={s.cls}>{s.label}</span>
+        {i.kind === "job" && i.status === "running" && (
+          <span className="tnum text-mute">{Math.round(i.latencyNow)}ms</span>
+        )}
+        {i.kind === "job" && i.status === "completed" && i.reward !== undefined && (
+          <span className="tnum text-mute">${i.reward.toFixed(2)}</span>
+        )}
+        <span className="ml-4 text-mute" aria-hidden>
+          ◆
+        </span>
       </span>
-      <span className="tnum text-[11px] text-mute">{fmtLatency(c.latency)}</span>
-      <span className="ml-4 text-mute" aria-hidden>
-        ◆
-      </span>
-    </span>
-  ));
-
-  const regionItems = snap.regions.slice(0, 4).map((r) => (
-    <span key={r.key} className="mx-7 inline-flex items-baseline gap-3 font-mono text-[12px]">
-      <span className="tracking-[0.04em] text-dim">{r.key}</span>
-      <span className="tnum text-ink">{r.pflops.toFixed(1)} PF</span>
-      <span className={`tnum ${r.delta >= 0 ? "text-pos" : "text-neg"}`}>
-        {r.delta >= 0 ? "+" : ""}
-        {r.delta.toFixed(2)}%
-      </span>
-      <span className="ml-4 text-mute" aria-hidden>
-        ◆
-      </span>
-    </span>
-  ));
-
-  const items = [...classItems, ...regionItems];
+    );
+  });
 
   return (
     <div className="hairline-t hairline-b relative overflow-hidden bg-[rgba(5,5,7,0.55)] py-3">

@@ -7,30 +7,21 @@ import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { AnimatePresence, motion } from "framer-motion";
 import NetworkMesh from "@/components/gl/NetworkMesh";
-import CountUp from "@/components/ui/CountUp";
 import { Wordmark } from "@/components/ui/Logo";
-import { fmtCompact } from "@/lib/format";
-import { createNetwork, stepNetwork, type NetworkState } from "@/lib/network";
+import { itemDetail, itemStatusLabel, itemTitle } from "@/components/ui/feedFormat";
+import { fmtRangeMs, fmtTilde } from "@/lib/format";
+import { createNetwork, stepNetwork } from "@/lib/network";
 import { mulberry32 } from "@/lib/prng";
+import { useFeed } from "@/lib/useFeed";
+import type { FeedItem, JobItem, TokenItem, WorkerItem } from "@/lib/feed";
 import { bindPointer, viewState } from "@/lib/viewState";
 
 /**
- * The network console: the operational view of the mesh. Providers are
- * luminous nodes, jobs are packets in flight, earnings arrive as light.
- * The DOM is a thin glass HUD around a living system — no tables, no
- * forms, just the network and its instruments.
+ * The network console: a live event stream over the living mesh.
+ * Every feed row is inspectable in place — clicking one opens a
+ * block-explorer drawer with the structured truth of that event.
+ * No separate pages, no analytics chrome. A system, in motion.
  */
-
-const KIND_LABEL: Record<string, string> = {
-  inference: "inference",
-  training: "training",
-  settlement: "settlement",
-};
-const KIND_DOT: Record<string, string> = {
-  inference: "bg-signal",
-  training: "bg-violet",
-  settlement: "bg-cyan",
-};
 
 function ConsoleRig() {
   const { camera } = useThree();
@@ -48,86 +39,235 @@ function ConsoleRig() {
   return null;
 }
 
-function Panel({
-  className,
-  children,
-  delay = 0,
-}: {
-  className?: string;
-  children: React.ReactNode;
-  delay?: number;
-}) {
+/* ---------- explorer drawer renderers ---------- */
+
+function Field({ k, v, cls }: { k: string; v: React.ReactNode; cls?: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{ duration: 0.8, delay, ease: [0.7, 0, 0.3, 1] }}
-      className={`glass reticle pointer-events-auto ${className ?? ""}`}
-    >
-      {children}
-    </motion.div>
+    <div className="flex items-baseline justify-between gap-4 py-[5px]">
+      <span className="font-mono text-[11px] text-mute">{k}</span>
+      <span className={`text-right font-mono text-[12px] ${cls ?? "text-dim"}`}>{v}</span>
+    </div>
   );
 }
 
-/** poll the mutable sim into React at a readable cadence */
-function useSimReadout(state: NetworkState) {
-  const [, force] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => force((v) => v + 1), 400);
-    return () => clearInterval(t);
-  }, []);
-  return state;
+function BlockSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="border-t border-line px-5 py-4">
+      <p className="col-heading mb-2 !text-[10.5px]">{title}</p>
+      {children}
+    </div>
+  );
 }
+
+function JobBlock({ j, onPick }: { j: JobItem; onPick: (hash: string) => void }) {
+  const s = itemStatusLabel(j);
+  return (
+    <>
+      <BlockSection title="task">
+        <Field k="type" v="job_execution" />
+        <Field k="workload" v={`${j.type} / ${j.model}`} cls="text-ink" />
+        <Field k="hash" v={j.hash} />
+        <Field k="status" v={j.status} cls={s.cls} />
+        <Field k="finalized" v={j.finalized ? "true" : "false"} />
+      </BlockSection>
+      <BlockSection title="execution">
+        <Field
+          k="node"
+          v={
+            <button onClick={() => onPick(j.node)} className="text-signal hover:text-signal-bright">
+              {j.node}
+            </button>
+          }
+        />
+        {j.previousNode && <Field k="previous node" v={j.previousNode} cls="text-mute" />}
+        {j.rerouteReason && <Field k="reroute reason" v={j.rerouteReason} cls="text-violet" />}
+        <Field k="gpu" v={j.gpu} />
+        <Field k="latency" v={fmtRangeMs(j.latencyLo, j.latencyHi)} />
+        <Field k="observed" v={`${Math.round(j.latencyNow)}ms`} />
+        <Field k="retries" v={j.retries} cls={j.retries > 0 ? "text-violet" : undefined} />
+        {j.status === "running" && (
+          <Field k="progress" v={`${Math.round(j.progress)}%`} cls="text-signal-bright" />
+        )}
+      </BlockSection>
+      <BlockSection title="result">
+        {j.status === "completed" && (
+          <>
+            <Field k="verified" v="output accepted" cls="text-pos" />
+          </>
+        )}
+        {j.status === "pending finalization" && (
+          <Field k="verified" v="awaiting settlement" cls="text-mute" />
+        )}
+        {j.status === "failed" && <Field k="verified" v="rejected · retry scheduled" cls="text-neg" />}
+        {(j.status === "running" || j.status === "rerouted") && (
+          <Field k="verified" v="in flight" cls="text-mute" />
+        )}
+      </BlockSection>
+      {j.reward !== undefined && (
+        <BlockSection title="economics">
+          <Field k="reward" v={`${j.reward.toFixed(2)} USDC`} cls="text-cyan" />
+          <Field k="settled" v={j.finalized ? `epoch 1,284` : "pending"} />
+        </BlockSection>
+      )}
+      <BlockSection title="trace">
+        <p className="font-mono text-[11.5px] leading-[1.9] text-dim">
+          {j.trace.map((t, i) => (
+            <span key={i}>
+              {i > 0 && <span className="text-mute"> → </span>}
+              <span className={t.startsWith("rerouted") ? "text-violet" : t === "paid" ? "text-pos" : ""}>
+                {t}
+              </span>
+            </span>
+          ))}
+        </p>
+      </BlockSection>
+    </>
+  );
+}
+
+function WorkerBlock({
+  w,
+  jobs,
+  onPickJob,
+}: {
+  w: WorkerItem;
+  jobs: JobItem[];
+  onPickJob: (j: JobItem) => void;
+}) {
+  const recent = jobs.filter((j) => j.node === w.node).slice(0, 4);
+  return (
+    <>
+      <BlockSection title="node">
+        <Field k="id" v={w.node} cls="text-ink" />
+        <Field k="region" v={w.region} />
+        <Field
+          k="status"
+          v={w.status === "recovered" ? "online" : w.status}
+          cls={w.status === "unstable" ? "text-neg" : "text-pos"}
+        />
+        <Field k="gpu" v={w.gpu} />
+        {w.note && <Field k="note" v={w.note} cls="text-violet" />}
+      </BlockSection>
+      <BlockSection title="load">
+        <p className="font-mono text-[12px] text-dim">
+          {Math.round(w.loadLo)}% <span className="text-mute">→</span> {Math.round(w.loadNow)}%{" "}
+          <span className="text-mute">→</span> {Math.round(w.loadHi)}%{" "}
+          <span className="text-mute">(fluctuating)</span>
+        </p>
+        <div className="mt-2 h-[4px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.06)]">
+          <div
+            className={`h-full rounded-full transition-[width] duration-1000 ${w.status === "unstable" ? "bg-neg/70" : "bg-signal/70"}`}
+            style={{ width: `${w.loadNow}%` }}
+          />
+        </div>
+      </BlockSection>
+      <BlockSection title="economics">
+        <Field k="earnings (epoch)" v={`${w.earningsEpoch.toFixed(2)} USDC`} cls="text-cyan" />
+      </BlockSection>
+      <BlockSection title="recent jobs">
+        {recent.length === 0 && (
+          <p className="font-mono text-[11.5px] text-mute">nothing in the current window</p>
+        )}
+        {recent.map((j) => {
+          const s = itemStatusLabel(j);
+          return (
+            <button
+              key={j.id}
+              onClick={() => onPickJob(j)}
+              className="flex w-full items-baseline justify-between py-[5px] text-left hover:bg-[rgba(235,240,255,0.03)]"
+            >
+              <span className="font-mono text-[11.5px] text-signal">{j.hash}</span>
+              <span className={`font-mono text-[11px] ${s.cls}`}>{j.status}</span>
+            </button>
+          );
+        })}
+      </BlockSection>
+    </>
+  );
+}
+
+function TokenBlock({ t }: { t: TokenItem }) {
+  return (
+    <>
+      <BlockSection title="event">
+        <Field k="type" v={t.type} cls={t.type === "slash" ? "text-neg" : "text-cyan"} />
+        <Field k="amount" v={`${t.amount.toLocaleString()} ${t.unit}`} cls="text-ink" />
+        <Field k="source" v={t.source} />
+        {t.node && <Field k="node" v={t.node} />}
+        <Field k="state" v={t.state} cls={t.state === "pending" ? "text-mute" : "text-pos"} />
+      </BlockSection>
+      <BlockSection title="context">
+        <p className="font-mono text-[11.5px] leading-[1.8] text-mute">
+          {t.type === "slash"
+            ? "invalid execution reduces trust: stake down, routing weight down. failure is part of system behavior."
+            : "burn is not scheduled. it happens when compute happens — a share of execution fees buys $Q0R and retires it."}
+        </p>
+      </BlockSection>
+    </>
+  );
+}
+
+/* ---------- console ---------- */
 
 export default function Console() {
   const network = useMemo(() => {
     const net = createNetwork(72, "console-mesh");
-    // fast-forward so the console opens onto a system already in motion
     const warm = mulberry32(0xfa57);
     for (let i = 0; i < 240; i++) stepNetwork(net, 0.1, warm);
     return net;
   }, []);
-  const sim = useSimReadout(network);
-  const [selected, setSelected] = useState<number>(-1);
   const meshProgress = useRef({ opacity: 1, form: 1 });
+  const snap = useFeed();
+  const [selected, setSelected] = useState<FeedItem | null>(null);
+  const [meshSelected, setMeshSelected] = useState(-1);
 
   useEffect(() => bindPointer(), []);
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSelected(-1);
+      if (e.key === "Escape") {
+        setSelected(null);
+        setMeshSelected(-1);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const inspectorRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (selected >= 0) inspectorRef.current?.focus();
-  }, [selected]);
+  const jobs = snap.items.filter((i): i is JobItem => i.kind === "job");
 
-  // jobs/min over a sliding window
-  const rate = useRef<{ t: number; jobs: number }[]>([]);
-  rate.current.push({ t: sim.time, jobs: sim.totalJobs });
-  if (rate.current.length > 40) rate.current.shift();
-  const windowStart = rate.current[0];
-  const jobsPerMin =
-    sim.time - windowStart.t > 1
-      ? ((sim.totalJobs - windowStart.jobs) / (sim.time - windowStart.t)) * 60
-      : 0;
-
-  // plain per-render computation: sim.events is mutated in place, so a
-  // useMemo keyed on it would never recompute (24 items, memo buys nothing)
-  const counts = { inference: 0, training: 0, settlement: 0 };
-  for (const e of sim.events) counts[e.kind]++;
-  const evTotal = Math.max(1, sim.events.length);
-  const kindCounts = {
-    inference: counts.inference / evTotal,
-    training: counts.training / evTotal,
-    settlement: counts.settlement / evTotal,
+  const pickNodeByName = (name: string) => {
+    const w = snap.workers.find((w) => w.node === name);
+    if (w) setSelected(w);
   };
 
-  const node = selected >= 0 ? sim.nodes[selected] : null;
+  const pickMeshNode = (idx: number) => {
+    setMeshSelected(idx);
+    const n = network.nodes[idx];
+    // present the mesh node as a worker block
+    const w: WorkerItem = {
+      kind: "worker",
+      id: `mesh-${n.id}`,
+      block: 918_000 + idx,
+      node: n.id,
+      region: n.region,
+      gpu: `${n.gpuClass}`,
+      status: n.reliability > 0.975 ? "online" : "unstable",
+      loadLo: Math.max(10, Math.round(n.utilization * 100) - 14),
+      loadHi: Math.min(99, Math.round(n.utilization * 100) + 12),
+      loadNow: Math.round(n.utilization * 100),
+      note: n.reliability <= 0.975 ? "reliability degraded" : undefined,
+      earningsEpoch: n.earnings,
+      recent: [],
+      updatedTick: snap.tick,
+    };
+    setSelected(w);
+  };
+
+  const drawerTitle = selected
+    ? selected.kind === "token"
+      ? `EVENT #${selected.block.toLocaleString("en-US")}`
+      : `BLOCK #${selected.block.toLocaleString("en-US")}`
+    : "";
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-bg">
@@ -140,6 +280,10 @@ export default function Console() {
           gl.setClearColor("#030304");
           scene.fog = new THREE.Fog("#030304", 8, 26);
         }}
+        onPointerMissed={() => {
+          setSelected(null);
+          setMeshSelected(-1);
+        }}
         className="absolute inset-0"
       >
         <ConsoleRig />
@@ -147,10 +291,10 @@ export default function Console() {
           progressRef={meshProgress}
           network={network}
           scale={7}
-          position={[0, 0, -4]}
+          position={[1.2, 0.1, -4]}
           rotationSpeed={0.014}
-          onPick={setSelected}
-          selected={selected}
+          onPick={pickMeshNode}
+          selected={meshSelected}
         />
         <EffectComposer>
           <Bloom mipmapBlur intensity={1.05} luminanceThreshold={0.16} luminanceSmoothing={0.3} radius={0.85} />
@@ -158,222 +302,157 @@ export default function Console() {
         </EffectComposer>
       </Canvas>
 
-      {/* HUD */}
-      <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-4 md:p-6">
-        {/* top bar */}
-        <div className="flex items-start justify-between gap-4">
-          <Panel className="flex items-center gap-5 px-5 py-3">
-            <Link href="/" className="pointer-events-auto" aria-label="Back to overview">
-              <Wordmark />
-            </Link>
-            <span className="hidden h-4 w-px bg-line md:block" aria-hidden />
-            <span className="chip hidden md:inline">NETWORK CONSOLE</span>
-          </Panel>
-          <Panel delay={0.08} className="flex items-center gap-5 px-5 py-3.5">
-            <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">
-              <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-pos" aria-hidden />
-              mainnet
-            </span>
-            <span className="hidden font-mono text-[11px] uppercase tracking-[0.12em] text-mute md:inline">
-              epoch <span className="tnum text-ink">1,284</span>
-            </span>
-            <Link
-              href="/"
-              className="pointer-events-auto font-mono text-[11px] uppercase tracking-[0.12em] text-signal transition-colors hover:text-signal-bright"
-            >
-              ← overview
-            </Link>
-          </Panel>
+      {/* top bar */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-4 p-4 md:p-6">
+        <div className="glass reticle pointer-events-auto flex items-center gap-5 px-5 py-3">
+          <Link href="/" aria-label="Back to overview">
+            <Wordmark />
+          </Link>
+          <span className="hidden h-4 w-px bg-line md:block" aria-hidden />
+          <span className="chip hidden md:inline">NETWORK CONSOLE</span>
         </div>
-
-        {/* middle row: left stats + right inspector */}
-        <div className="flex items-center justify-between gap-4">
-          <Panel delay={0.16} className="hidden w-[240px] flex-col gap-5 p-5 md:flex">
-            <span className="col-heading">Network</span>
-            <div>
-              <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint">
-                Active GPUs
-              </p>
-              <CountUp
-                value={sim.activeGpus}
-                format={(v) => Math.round(v).toLocaleString("en-US")}
-                className="font-display text-[26px] font-semibold text-ink"
-              />
-            </div>
-            <div>
-              <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint">
-                Providers online
-              </p>
-              <p className="tnum font-display text-[26px] font-semibold text-ink">
-                {sim.nodes.length}
-              </p>
-            </div>
-            <div>
-              <label
-                htmlFor="node-select"
-                className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint"
-              >
-                Inspect node
-              </label>
-              <select
-                id="node-select"
-                value={selected}
-                onChange={(e) => setSelected(Number(e.target.value))}
-                className="mt-1.5 w-full rounded-[6px] border border-line bg-[rgba(10,12,18,0.8)] px-2.5 py-2 font-mono text-[11.5px] text-dim outline-none focus:border-[rgba(91,124,255,0.55)]"
-              >
-                <option value={-1}>— pick from mesh —</option>
-                {sim.nodes.map((n, i) => (
-                  <option key={n.id} value={i}>
-                    {n.id} · {n.region} · {n.gpuClass}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint">
-                Settled this epoch
-              </p>
-              <CountUp
-                value={sim.settledUsd}
-                format={(v) => fmtCompact(v)}
-                className="font-display text-[26px] font-semibold text-signal-bright"
-              />
-            </div>
-          </Panel>
-
-          <AnimatePresence>
-            {node && (
-              <motion.div
-                key={selected}
-                ref={inspectorRef}
-                tabIndex={-1}
-                role="dialog"
-                aria-label={`Node ${node.id}`}
-                initial={{ opacity: 0, x: 24, filter: "blur(8px)" }}
-                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, x: 24, filter: "blur(6px)" }}
-                transition={{ duration: 0.5, ease: [0.7, 0, 0.3, 1] }}
-                className="glass reticle pointer-events-auto w-[280px] p-5 outline-none"
-              >
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="col-heading">Node {node.id}</span>
-                  <button
-                    onClick={() => setSelected(-1)}
-                    className="font-mono text-[13px] text-mute hover:text-ink"
-                    aria-label="Close inspector"
-                  >
-                    ×
-                  </button>
-                </div>
-                <div className="flex flex-col gap-3 font-mono text-[12px]">
-                  <div className="flex justify-between">
-                    <span className="text-faint">region</span>
-                    <span className="text-dim">{node.region}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-faint">class</span>
-                    <span className="text-dim">{node.gpuClass}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-faint">capacity</span>
-                    <span className="tnum text-dim">{node.capacity.toLocaleString()} GPUs</span>
-                  </div>
-                  <div>
-                    <div className="mb-1.5 flex justify-between">
-                      <span className="text-faint">utilization</span>
-                      <span className="tnum text-ink">{(node.utilization * 100).toFixed(1)}%</span>
-                    </div>
-                    <div className="h-[5px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.07)]">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-signal to-violet transition-[width] duration-500"
-                        style={{ width: `${node.utilization * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-faint">reliability</span>
-                    <span className="tnum text-pos">{(node.reliability * 100).toFixed(2)}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-faint">stake</span>
-                    <span className="tnum text-dim">{fmtCompact(node.stake, "")} Q0R</span>
-                  </div>
-                  <div className="flex justify-between border-t border-line pt-3">
-                    <span className="text-faint">session rewards</span>
-                    <CountUp
-                      value={node.earnings}
-                      format={(v) => `${v.toFixed(2)} USDC`}
-                      className="text-cyan"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* bottom row */}
-        <div className="flex items-end justify-between gap-4">
-          <Panel delay={0.24} className="w-full max-w-[430px] p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="col-heading">Job stream</span>
-              <span className="tnum font-mono text-[10.5px] uppercase tracking-[0.1em] text-faint">
-                {jobsPerMin.toFixed(0)} jobs/min
-              </span>
-            </div>
-            <ul className="flex flex-col gap-1.5 font-mono text-[11px]">
-              <AnimatePresence initial={false}>
-                {sim.events.slice(0, 6).map((e) => (
-                  <motion.li
-                    key={e.id}
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.7, 0, 0.3, 1] }}
-                    className="flex items-center gap-2.5"
-                  >
-                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${KIND_DOT[e.kind]}`} aria-hidden />
-                    <span className="tnum text-faint">
-                      0x{(e.id * 2654435761 % 0xffffff).toString(16).padStart(6, "0")}
-                    </span>
-                    <span className="text-mute">→ {e.nodeId}</span>
-                    <span className="text-dim">{KIND_LABEL[e.kind]}</span>
-                    <span className="tnum ml-auto text-mute">{e.tflopHours.toFixed(1)} TFLOP·h</span>
-                    <span className="tnum text-signal-bright">${e.paidUsd.toFixed(2)}</span>
-                  </motion.li>
-                ))}
-              </AnimatePresence>
-            </ul>
-          </Panel>
-
-          <Panel delay={0.3} className="hidden w-[260px] flex-col gap-4 p-5 lg:flex">
-            <span className="col-heading">Flows</span>
-            {(["inference", "training", "settlement"] as const).map((k) => (
-              <div key={k}>
-                <div className="mb-1.5 flex justify-between font-mono text-[10.5px] uppercase tracking-[0.1em]">
-                  <span className="flex items-center gap-2 text-faint">
-                    <span className={`h-1.5 w-1.5 rounded-full ${KIND_DOT[k]}`} aria-hidden />
-                    {k}
-                  </span>
-                  <span className="tnum text-dim">{Math.round(kindCounts[k] * 100)}%</span>
-                </div>
-                <div className="h-[4px] overflow-hidden rounded-full bg-[rgba(235,240,255,0.07)]">
-                  <div
-                    className={`h-full rounded-full transition-[width] duration-700 ${
-                      k === "inference" ? "bg-signal" : k === "training" ? "bg-violet" : "bg-cyan"
-                    }`}
-                    style={{ width: `${kindCounts[k] * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-            <p className="border-t border-line pt-3 font-mono text-[10px] leading-[1.6] text-faint">
-              Compute is routed across the mesh by latency, stake, and demand.
-              Select a node to inspect it.
-            </p>
-          </Panel>
+        <div className="glass reticle pointer-events-auto flex items-center gap-5 px-5 py-3.5">
+          <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">
+            <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-pos" aria-hidden />
+            mainnet
+          </span>
+          <span className="hidden font-mono text-[11px] uppercase tracking-[0.12em] text-mute md:inline">
+            epoch <span className="tnum text-ink">{snap.epoch.toLocaleString()}</span>
+          </span>
+          <Link
+            href="/"
+            className="font-mono text-[11px] uppercase tracking-[0.12em] text-signal transition-colors hover:text-signal-bright"
+          >
+            ← overview
+          </Link>
         </div>
       </div>
+
+      {/* live feed — primary UI */}
+      <div className="absolute max-md:inset-x-3 max-md:bottom-3 max-md:h-[42vh] md:bottom-6 md:left-6 md:top-24 md:w-[390px]">
+      <div className="glass reticle flex h-full flex-col overflow-hidden">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
+          <span className="col-heading">live feed</span>
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-mute">
+            in flight {fmtTilde(snap.approx.jobsInFlight)}
+          </span>
+        </div>
+        <div className="flex-1 overflow-y-auto px-1.5 py-1.5">
+          <AnimatePresence initial={false}>
+            {snap.items.map((i) => {
+              const s = itemStatusLabel(i);
+              const active = selected?.id === i.id;
+              const dot =
+                i.kind === "job" ? "bg-signal" : i.kind === "worker" ? "bg-violet" : "bg-cyan";
+              return (
+                <motion.button
+                  key={i.id}
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, ease: [0.7, 0, 0.3, 1] }}
+                  onClick={() => {
+                    setSelected(i);
+                    setMeshSelected(-1);
+                  }}
+                  aria-pressed={active}
+                  className={`grid w-full grid-cols-[8px_1fr_auto] items-baseline gap-x-2.5 rounded-[6px] px-2.5 py-[6px] text-left transition-colors duration-150 ${
+                    active ? "bg-[rgba(91,124,255,0.08)]" : "hover:bg-[rgba(235,240,255,0.03)]"
+                  }`}
+                >
+                  <span className={`h-1.5 w-1.5 self-center rounded-full ${dot}`} aria-hidden />
+                  <span className="truncate font-mono text-[12px] text-ink">{itemTitle(i)}</span>
+                  <span className={`font-mono text-[10.5px] ${s.cls}`}>{s.label}</span>
+                  <span aria-hidden />
+                  <span className="col-span-2 truncate font-mono text-[10.5px] text-mute">
+                    {itemDetail(i)}
+                  </span>
+                </motion.button>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+        <div className="flex items-center justify-between border-t border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-mute">
+          <span>providers {snap.approx.providersMasked}</span>
+          <span>
+            latency {fmtRangeMs(snap.approx.latencyLo, snap.approx.latencyHi)} · varies
+          </span>
+        </div>
+      </div>
+      </div>
+
+      {/* network state (approx) — quiet corner panel, yields to the drawer */}
+      <div
+        className={`glass pointer-events-none absolute bottom-6 right-6 hidden w-[240px] flex-col gap-1.5 p-4 transition-opacity duration-300 lg:flex ${selected ? "opacity-0" : "opacity-100"}`}
+      >
+        <span className="col-heading mb-1">network state</span>
+        <p className="flex justify-between font-mono text-[11px]">
+          <span className="text-mute">providers</span>
+          <span className="tnum text-dim">{snap.approx.providersMasked}</span>
+        </p>
+        <p className="flex justify-between font-mono text-[11px]">
+          <span className="text-mute">jobs in flight</span>
+          <span className="tnum text-dim">{fmtTilde(snap.approx.jobsInFlight)}</span>
+        </p>
+        <p className="flex justify-between font-mono text-[11px]">
+          <span className="text-mute">median latency</span>
+          <span className="tnum text-dim">
+            {fmtRangeMs(snap.approx.latencyLo, snap.approx.latencyHi)}
+          </span>
+        </p>
+        <p className="flex justify-between font-mono text-[11px]">
+          <span className="text-mute">failover</span>
+          <span className="text-dim">occasional</span>
+        </p>
+        <p className="flex justify-between font-mono text-[11px]">
+          <span className="text-mute">settlement</span>
+          <span className="text-dim">epoch-based</span>
+        </p>
+      </div>
+
+      {/* explorer drawer */}
+      <AnimatePresence>
+        {selected && (
+          <motion.aside
+            key={selected.id}
+            initial={{ x: "105%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "105%" }}
+            transition={{ duration: 0.45, ease: [0.7, 0, 0.3, 1] }}
+            role="dialog"
+            aria-label={drawerTitle}
+            className="absolute z-10 max-md:inset-x-3 max-md:bottom-3 max-md:top-[22vh] md:bottom-6 md:right-6 md:top-24 md:w-[420px]"
+          >
+          <div className="glass reticle flex h-full flex-col overflow-hidden">
+            <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+              <span className="font-mono text-[13px] font-medium tracking-[0.04em] text-ink">
+                {drawerTitle}
+              </span>
+              <button
+                onClick={() => {
+                  setSelected(null);
+                  setMeshSelected(-1);
+                }}
+                className="font-mono text-[14px] text-mute hover:text-ink"
+                aria-label="Close explorer"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto pb-2">
+              {selected.kind === "job" && <JobBlock j={selected} onPick={pickNodeByName} />}
+              {selected.kind === "worker" && (
+                <WorkerBlock w={selected} jobs={jobs} onPickJob={(j) => setSelected(j)} />
+              )}
+              {selected.kind === "token" && <TokenBlock t={selected} />}
+            </div>
+            <div className="border-t border-line px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-mute">
+              snapshot · updates live in feed
+            </div>
+          </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
