@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import MotionProvider from "@/components/providers/MotionProvider";
+import TxToasts from "@/components/web3/TxToasts";
 import "./globals.css";
 
 const grotesk = Space_Grotesk({
@@ -40,7 +41,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${grotesk.variable} ${plex.variable}`}>
       <body>
-        <MotionProvider>{children}</MotionProvider>
+        <MotionProvider>
+          {children}
+          <TxToasts />
+        </MotionProvider>
       </body>
     </html>
   );

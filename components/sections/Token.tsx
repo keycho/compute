@@ -2,6 +2,7 @@
 
 import Reveal from "@/components/ui/Reveal";
 import Scramble from "@/components/ui/Scramble";
+import StakeWidget from "@/components/web3/StakeWidget";
 
 /**
  * Not a tokenomics page — the staking model stated plainly. No simulated
@@ -65,8 +66,11 @@ export default function Token() {
         </Reveal>
 
         <div className="mt-16 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-          {/* staking model — no simulated totals */}
+          {/* the staking desk + the model beneath it */}
           <Reveal>
+            <div className="mb-6">
+              <StakeWidget />
+            </div>
             <div className="glass reticle p-6">
               <div className="mb-4 flex items-center justify-between">
                 <span className="col-heading">staking model</span>

@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Reveal from "@/components/ui/Reveal";
+import NodeEarnings from "@/components/web3/NodeEarnings";
 import { useFeed } from "@/lib/useFeed";
 
 /**
@@ -165,8 +166,9 @@ export default function SupplyGpu() {
         ))}
       </div>
 
-      {/* live evidence */}
+      {/* payout desk + live evidence */}
       <Reveal delay={0.15}>
+        <NodeEarnings />
         <ShareFeed />
       </Reveal>
     </div>
