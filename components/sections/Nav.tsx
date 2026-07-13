@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Wordmark } from "@/components/ui/Logo";
+import ConnectButton from "@/components/web3/ConnectButton";
 
 const LINKS = [
   { label: "Execute", href: "/execute" },
@@ -62,6 +63,9 @@ export default function Nav() {
             </svg>
           </a>
           <div className="mx-2 my-4 w-px bg-line" aria-hidden />
+          <div className="mr-3 self-center">
+            <ConnectButton />
+          </div>
           <Link
             href="/explore"
             className="my-3 inline-flex items-center gap-2 self-center rounded-[2px] bg-signal px-6 py-[10px] font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050505] transition-all duration-[450ms] ease-[cubic-bezier(0.7,0,0.3,1)] hover:bg-signal-bright hover:shadow-[0_0_28px_rgba(255,255,255,0.4)]"
@@ -125,12 +129,15 @@ export default function Nav() {
                 </svg>
                 @q0rcompute
               </a>
-              <Link
-                href="/explore"
-                className="mt-5 inline-flex items-center justify-center gap-2 rounded-[2px] bg-signal px-6 py-3.5 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050505]"
-              >
-                Explorer <span aria-hidden>→</span>
-              </Link>
+              <div className="mt-5 flex items-center justify-between gap-3">
+                <ConnectButton compact />
+                <Link
+                  href="/explore"
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-[2px] bg-signal px-6 py-3 font-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[#050505]"
+                >
+                  Explorer <span aria-hidden>→</span>
+                </Link>
+              </div>
             </div>
           </motion.nav>
         )}
